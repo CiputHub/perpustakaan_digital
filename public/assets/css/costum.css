@@ -1,0 +1,17 @@
+html, body {
+    height: 100%;
+}
+
+.wrapper {
+    min-height: 100vh;
+}
+
+.main-panel {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
