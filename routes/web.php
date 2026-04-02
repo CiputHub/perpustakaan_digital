@@ -10,6 +10,10 @@ Route::get('/dashboard', function () {
     return view('/dashboard');
 })->middleware('auth')->name('dashboard');
 
+Route::get('/frontend/view/index', function () {
+    return view('frontend.view.index');
+});
+
 Route::get('/peminjaman', [PeminjamanController::class, 'index'])
     ->name('peminjaman.index');
 
