@@ -26,7 +26,7 @@
 <li class="nav-item {{ request()->routeIs('petugas.*') ? 'active' : '' }}">
     <a href="{{ route('petugas.index') }}">
         <i class="fas fa-user"></i>
-        <p>petugas</p>
+        <p>Petugas</p>
     </a>
 </li>
 

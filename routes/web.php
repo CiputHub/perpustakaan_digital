@@ -1,21 +1,26 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PeminjamanController;
-use App\Http\Controllers\BukuController;
-use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BukuController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PetugasController;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/dashboard', function () {
-    return view('/dashboard');
-})->middleware('auth')->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
 
 Route::get('/frontend/view/index', function () {
     return view('frontend.view.index');
 });
 
+Route::get('/', [FrontendController::class, 'index']);
+
 Route::get('/peminjaman', [PeminjamanController::class, 'index'])
     ->name('peminjaman.index');
+
 
 
 Route::resource('/buku', BukuController::class);

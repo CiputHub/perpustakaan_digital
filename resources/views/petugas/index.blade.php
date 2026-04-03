@@ -46,13 +46,13 @@
                 <td>{{ $p->alamat }}</td>
 
                 <td>
-                    <a href="{{ route('petugas.show', $p->user) }}"
+                    <a href="{{ route('petugas.show', $p->id_petugas) }}"
                         class="btn btn-sm btn-info">Detail</a>
 
-                        <a href="{{ route('petugas.edit', $p->user) }}"
+                        <a href="{{ route('petugas.edit', $p->id_petugas) }}"
                             class="btn btn-sm btn-warning">Edit</a>
 
-                    <form action="{{ route('petugas.destroy', $p->user) }}"
+                    <form action="{{ route('petugas.destroy', $p->id_petugas) }}"
                         method="POST"
                         style="display:inline;"
                         onsubmit="return confirm('Yakin hapus data ini?')">
@@ -73,7 +73,11 @@
                 </div>
               </div>
 
-
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
 
         @endsection
 

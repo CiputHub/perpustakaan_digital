@@ -34,7 +34,7 @@
                 <td>{{ $key + 1 }}</td>
                 <td>{{ $row->judul }}</td>
                 <td class="text-center">
-                    <img src="{{ asset('/storage/buku/'.$row->gambar) }}" class="rounded" style="width: 150px">
+                    <img src="{{ asset('/storage/buku/'.$row->gambar) }}" class="rounded" style="width: 90px">
                 </td>
                 <td>{{ $row->penulis }}</td>
                 <td>{{ $row->penerbit }}</td>

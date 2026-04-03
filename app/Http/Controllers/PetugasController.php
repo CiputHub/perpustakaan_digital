@@ -29,14 +29,35 @@ class PetugasController extends Controller
     {
 
         $request->validate([
-            'username'   => 'required',
-            'email'      => 'required|email|unique:users,email',
-            'password'   => 'required|min:1',
+    'username' => 'required|min:4|max:20|unique:users,username',
+    'email' => 'required|email|unique:users,email',
+    'password' => 'required|min:2',
 
-            'nama'       => 'required',
-            'no_telepon' => 'required',
-            'alamat'     => 'required'
-        ]);
+    'nama' => 'required|min:3|max:100',
+    'no_telepon' => 'required|numeric|digits_between:10,15|unique:petugas,no_telepon',
+    'alamat' => 'required|min:5'
+], [
+    // custom message biar jelas 🔥
+    'username.required' => 'Username wajib diisi!',
+    'username.unique' => 'Username sudah digunakan!',
+    'username.min' => 'Username minimal 4 karakter!',
+
+    'email.required' => 'Email wajib diisi!',
+    'email.email' => 'Format email tidak valid!',
+    'email.unique' => 'Email sudah terdaftar!',
+
+    'password.required' => 'Password wajib diisi!',
+    'password.min' => 'Password minimal 6 karakter!',
+
+    'nama.required' => 'Nama wajib diisi!',
+
+    'no_telepon.required' => 'No telepon wajib diisi!',
+    'no_telepon.numeric' => 'No telepon harus angka!',
+    'no_telepon.unique' => 'No telepon sudah digunakan!',
+    'no_telepon.digits_between' => 'No telepon harus 10-15 digit!',
+
+    'alamat.required' => 'Alamat wajib diisi!'
+]);
 
         $user = User::create([
             'username' => $request->username,

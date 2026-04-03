@@ -150,6 +150,7 @@
 
 .header-carousel .carousel-img {
     position: relative;
+    width: 500px;;
 }
 
 .header-carousel .owl-nav {

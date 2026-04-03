@@ -1,6 +1,4 @@
-@if(auth()->check())
-    @include('partials.navbar')
-@endif
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

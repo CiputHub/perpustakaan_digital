@@ -33,7 +33,7 @@
                             <tr>
                                 <td>{{ $key + 1 }}</td>
 
-                                <td>{{ $row->buku_id }}</td>
+                                <td>{{ $row->judul }}</td>
                                 <td>{{ $row->anggota_id }}</td>
                                 <td>{{ $row->tanggal_pinjam }}</td>
                                 <td>{{ $row->tanggal_pengembalian }}</td>
@@ -47,6 +47,7 @@
                                     @endif
                                 </td>
                             </tr>
+
                             @endforeach
                         </tbody>
 
