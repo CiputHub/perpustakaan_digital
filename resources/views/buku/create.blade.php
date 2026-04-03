@@ -104,7 +104,7 @@
 
 
                             <button type="submit" class="btn btn-md btn-primary me-3">Simpan</button>
-                            <a href="/buku" class="btn btn-warning">Kembali</a>
+                            <a href="/admin/buku" class="btn btn-warning">Kembali</a>
 
                         </form>
                     </div>

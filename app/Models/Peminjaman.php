@@ -16,6 +16,16 @@ class Peminjaman extends Model
         'petugas_id',
         'tanggal_pinjam',
         'tanggal_pengembalian',
-        'status'
+        'status',
     ];
+
+    public function buku()
+{
+    return $this->belongsTo(Buku::class, 'buku_id', 'id_buku');
+}
+
+public function anggota()
+{
+    return $this->belongsTo(Anggota::class, 'anggota_id', 'id_anggota');
+}
 }
