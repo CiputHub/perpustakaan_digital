@@ -1,36 +1,59 @@
- <div class="sidebar-wrapper scrollbar scrollbar-inner">
-          <div class="sidebar-content">
-            <ul class="nav nav-secondary">
+<div class="sidebar-wrapper scrollbar scrollbar-inner">
+  <div class="sidebar-content">
+    <ul class="nav nav-secondary">
 
-             <li class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-    <a href="{{ route('dashboard') }}">
-        <i class="fas fa-home"></i>
-        <p>Dashboard</p>
-    </a>
-</li>
+      @php
+        $role = Auth::user()->role ?? null;
+      @endphp
 
-<li class="nav-item {{ request()->routeIs('peminjaman.*') ? 'active' : '' }}">
-    <a href="{{ route('peminjaman.index') }}">
-        <i class="fas fa-book"></i>
-        <p>Peminjaman</p>
-    </a>
-</li>
+      {{-- Dashboard (SEMUA ROLE) --}}
+      <li class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        <a href="{{ route('dashboard') }}">
+          <i class="fas fa-home"></i>
+          <p>Dashboard</p>
+        </a>
+      </li>
 
-<li class="nav-item {{ request()->routeIs('buku.*') ? 'active' : '' }}">
-    <a href="{{ route('buku.index') }}">
-        <i class="fas fa-book-open"></i>
-        <p>Buku</p>
-    </a>
-</li>
+      {{-- PEMINJAMAN (kepala + petugas) --}}
+      @if(in_array($role, ['kepala_perpus','petugas']))
+      <li class="nav-item {{ request()->routeIs('peminjaman.*') ? 'active' : '' }}">
+        <a href="{{ route('peminjaman.index') }}">
+          <i class="fas fa-book"></i>
+          <p>Peminjaman</p>
+        </a>
+      </li>
+      @endif
 
-<li class="nav-item {{ request()->routeIs('petugas.*') ? 'active' : '' }}">
-    <a href="{{ route('petugas.index') }}">
-        <i class="fas fa-user"></i>
-        <p>Petugas</p>
-    </a>
-</li>
+      {{-- BUKU (kepala + petugas) --}}
+      @if(in_array($role, ['kepala_perpus','petugas']))
+      <li class="nav-item {{ request()->routeIs('buku.*') ? 'active' : '' }}">
+        <a href="{{ route('buku.index') }}">
+          <i class="fas fa-book-open"></i>
+          <p>Buku</p>
+        </a>
+      </li>
+      @endif
 
+      {{-- PETUGAS (khusus kepala perpus) --}}
+      @if($role == 'kepala_perpus')
+      <li class="nav-item {{ request()->routeIs('petugas.*') ? 'active' : '' }}">
+        <a href="{{ route('petugas.index') }}">
+          <i class="fas fa-user"></i>
+          <p>Petugas</p>
+        </a>
+      </li>
+      @endif
 
-            </ul>
-          </div>
-        </div>
+      {{-- Anggota (khusus petugas) --}}
+      @if($role == 'petugas')
+      <li class="nav-item {{ request()->routeIs('anggota.*') ? 'active' : '' }}">
+        <a href="{{ route('anggota.index') }}">
+          <i class="fas fa-user"></i>
+          <p>Anggota</p>
+        </a>
+      </li>
+      @endif
+
+    </ul>
+  </div>
+</div>

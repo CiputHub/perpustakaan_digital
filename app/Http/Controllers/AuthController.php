@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\KepalaPerpus;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\KepalaPerpus;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
@@ -17,19 +18,22 @@ class AuthController extends Controller
     }
 
     // PROSES LOGIN
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+   public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
 
-        if (Auth::attempt($request->only('email','password'))) {
-            return redirect()->route('dashboard');
-        }
+    // 🔥 MATIIN SESSION ANGGOTA
+    Session::flush();
 
-        return back()->with('error','Email atau password salah!');
+    if (Auth::attempt($request->only('email','password'))) {
+        return redirect()->route('dashboard');
     }
+
+    return back()->with('error','Email atau password salah!');
+}
 
     public function registerForm()
 {

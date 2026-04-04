@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\AuthAnggotaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\PetugasController;
 use Illuminate\Support\Facades\Route;
@@ -14,10 +16,17 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
 
+    // login anggota
 
 
-Route::get('/peminjaman', [PeminjamanController::class, 'index'])
-    ->name('peminjaman.index');
+// dashboard anggota pakai middleware
+Route::prefix('anggota')
+    ->middleware('auth:anggota')
+    ->group(function(){
+        Route::get('/dashboard', [DashboardController::class,'index'])->name('anggota.dashboard.index');
+        // route anggota lain...
+    });
+
 
 Route::prefix('admin')->group(function () {
 Route::resource('buku', BukuController::class);
@@ -30,7 +39,27 @@ Route::get('/buku/{id}', [FrontendController::class, 'detail'])
 
 Route::resource('/petugas', PetugasController::class);
 
+Route::resource('/anggota', AnggotaController::class);
+
 //SISTEM LOGIN
+
+// hanya kepala perpus
+Route::middleware(['auth','role:kepala_perpus'])->group(function () {
+    Route::resource('petugas', PetugasController::class);
+});
+
+// petugas + kepala perpus
+Route::middleware(['auth','role:kepala_perpus,petugas'])->group(function () {
+    Route::get('/peminjaman', [PeminjamanController::class, 'index'])
+        ->name('peminjaman.index');
+});
+
+// petugas + kepala perpus
+Route::middleware(['auth','role:kepala_perpus,petugas'])->group(function () {
+    Route::get('/anggota', [AnggotaController::class, 'index'])
+        ->name('anggota.index');
+});
+
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -42,9 +71,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 //SISTEM FRONTEND
-Route::get('/frontend/view/index', function () {
-    return view('frontend.view.index');
-});
+Route::get('/frontend/view/index', [FrontendController::class, 'index'])
+    ->name('frontend.index');
 
 Route::get('/', [FrontendController::class, 'index']);
 
@@ -52,17 +80,15 @@ Route::get('/semua-buku', [FrontendController::class, 'semuaBuku'])
     ->name('semua.buku');
 
 
-Route::get('/login_anggota', [AuthAnggotaController::class, 'loginForm'])->name('login_anggota');
-Route::post('/login_anggota', [AuthAnggotaController::class, 'login'])
-    ->name('login.anggota.post');
+Route::get('/login_anggota', [LoginController::class,'showLoginForm'])->name('login_anggota');
+Route::post('/login_anggota', [LoginController::class,'login'])->name('login.anggota.post');
 
+Route::post('/logout_anggota', [LoginController::class,'logout'])->name('logout_anggota');
 
-    Route::get('/register_anggota', [AuthAnggotaController::class, 'registerForm'])->name('register_anggota');
-    Route::post('/register_anggota', [AuthAnggotaController::class, 'register'])
-        ->name('register.anggota.post');
+Route::get('/register_anggota', [AuthAnggotaController::class, 'registerForm'])->name('register_anggota');
+Route::post('/register_anggota', [AuthAnggotaController::class, 'register'])
+->name('register.anggota.post');
 
-Route::post('/logout_anggota', [AuthAnggotaController::class, 'logout'])
-    ->name('logout.anggota');
 
 
 
@@ -77,11 +103,11 @@ Route::put('/peminjaman/{id}/kembalikan', [PeminjamanController::class, 'kembali
     ->name('peminjaman.kembalikan');
 
 Route::get('/history', [PeminjamanController::class, 'history'])
-    ->middleware('auth')
+    ->middleware('auth:anggota')
     ->name('history');
 
 Route::get('/peminjaman/{id}/form-kembali', [PeminjamanController::class, 'formKembali'])
     ->name('peminjaman.formKembali');
-    
+
 
 

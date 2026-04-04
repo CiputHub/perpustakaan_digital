@@ -39,11 +39,16 @@ class PeminjamanController extends Controller
 
     public function create($id)
 {
-
     $buku = Buku::findOrFail($id);
 
-    // ambil anggota dari user login
-    $anggota = Anggota::where('user_id', Auth::id())->first();
+    $user = Auth::guard('anggota')->user();
+
+$anggota = Anggota::where('user_id', $user->id)->first();
+
+    if (!$anggota) {
+        return redirect()->route('login_anggota')
+            ->with('error', 'Silahkan login dulu');
+    }
 
     return view('frontend.peminjaman.form', compact('buku', 'anggota'));
 }
@@ -62,9 +67,15 @@ public function store(Request $request)
         return back()->with('error', 'Stok habis!');
     }
 
-    $anggota = Anggota::where('user_id', Auth::id())->first();
+    $user = Auth::guard('anggota')->user();
 
-    // 🔥 BATAS MAX 3 BUKU
+    $anggota = Anggota::where('user_id', $user->id)->first();
+
+    if (!$anggota) {
+        return redirect()->route('login_anggota');
+    }
+
+    // batas max 3 buku
     $jumlahPinjam = Peminjaman::where('anggota_id', $anggota->id_anggota)
         ->whereIn('status', ['menunggu', 'dipinjam'])
         ->count();
@@ -73,6 +84,7 @@ public function store(Request $request)
         return back()->with('error', 'Maksimal peminjaman 3 buku!');
     }
 
+    // ✅ HANYA SEKALI
     Peminjaman::create([
         'buku_id' => $buku->id_buku,
         'anggota_id' => $anggota->id_anggota,
@@ -87,20 +99,31 @@ public function store(Request $request)
 
 public function history()
 {
-    $anggota = Anggota::where('user_id', Auth::id())->first();
+    $user = Auth::guard('anggota')->user();
+
+    if (!$user) {
+        return redirect()->route('login_anggota')
+            ->with('error', 'Silahkan login dulu');
+    }
+
+    $anggota = Anggota::where('user_id', $user->id)->first();
+
+    if (!$anggota) {
+        return back()->with('error', 'Data anggota tidak ditemukan');
+    }
 
     $data = Peminjaman::with('buku')
         ->where('anggota_id', $anggota->id_anggota)
-       ->orderBy('id_peminjaman', 'desc')
+        ->orderBy('id_peminjaman', 'desc')
         ->get();
 
-        foreach ($data as $row) {
-    if ($row->status == 'dipinjam') {
-        if (now()->gt(\Carbon\Carbon::parse($row->tanggal_pengembalian))) {
-            $row->status = 'terlambat';
+    foreach ($data as $row) {
+        if ($row->status == 'dipinjam') {
+            if (now()->gt(\Carbon\Carbon::parse($row->tanggal_pengembalian))) {
+                $row->status = 'terlambat';
+            }
         }
     }
-}
 
     return view('frontend.history.index', compact('data'));
 }

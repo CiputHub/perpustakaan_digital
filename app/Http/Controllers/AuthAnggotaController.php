@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Anggota;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthAnggotaController extends Controller
@@ -14,24 +13,6 @@ class AuthAnggotaController extends Controller
     public function loginForm()
     {
         return view('frontend.auth.login_anggota');
-    }
-
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-
-            // cek role
-            if (Auth::user()->role != 'anggota') {
-                Auth::logout();
-                return back()->with('error', 'Bukan akun anggota!');
-            }
-
-            return redirect('/')->with('success', 'Login berhasil');
-        }
-
-        return back()->with('error', 'Email / Password salah');
     }
 
     // ================= REGISTER =================
@@ -69,10 +50,4 @@ class AuthAnggotaController extends Controller
         return redirect()->route('login_anggota')->with('success', 'Register berhasil');
     }
 
-    // ================= LOGOUT =================
-    public function logout()
-    {
-        Auth::logout();
-        return redirect('/');
-    }
 }

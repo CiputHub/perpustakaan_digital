@@ -122,4 +122,20 @@ public function show(string $id): View
         ->with(['success' => 'Data Berhasil Dihapus!']);
 }
 
+
+public function semuaBuku(Request $request)
+{
+    $query = Buku::query();
+
+    if ($request->has('search')) {
+        $query->where('judul', 'like', '%'.$request->search.'%')
+              ->orWhere('penulis', 'like', '%'.$request->search.'%')
+              ->orWhere('penerbit', 'like', '%'.$request->search.'%');
+    }
+
+    $buku = $query->paginate(12);
+
+    return view('frontend.semua-buku', compact('buku'));
+}
+
 }

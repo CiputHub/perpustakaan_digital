@@ -9,7 +9,7 @@ class FrontendController extends Controller
 {
     public function index()
 {
-    $buku = Buku::all(); // ambil data dari database
+    $buku = Buku::orderBy('id_buku', 'desc')->get();
     return view('frontend.view.index', compact('buku'));
 }
 
