@@ -55,7 +55,12 @@
                                             </span>
                                         </td>
                                     </tr>
+
                                 </table>
+                                <b>
+                                    <h2> 📚 Deskripsi/Sinopsis Buku: </h2>
+                                   {{ $buku->deskripsi }}
+                                </b>
 
                                 <div class="mt-3">
                                     <a href="{{ route('buku.index') }}" class="btn btn-secondary">

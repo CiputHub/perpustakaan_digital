@@ -21,6 +21,7 @@ class PeminjamanController extends Controller
 
     }
 
+
     public function acc($id)
 {
     $data = Peminjaman::findOrFail($id);
@@ -184,6 +185,18 @@ public function formKembali($id)
     }
 
     return view('frontend.pengembalian.index', compact('pinjam', 'denda', 'hariTelat'));
+}
+
+
+//LAPORAN PEMINJAMAN
+
+public function laporan()
+{
+    $data = Peminjaman::with(['buku', 'anggota'])
+        ->orderBy('id_peminjaman', 'desc')
+        ->get();
+
+    return view('backend.laporan.index', compact('data'));
 }
 
 }

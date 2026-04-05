@@ -65,6 +65,14 @@
                             </div>
 
                             <div class="mb-3">
+                                <label>Deskripsi</label>
+                                <textarea name="deskripsi"
+                                    value="{{ old('deskripsi', $buku->deskripsi) }}"
+                                    class="form-control">
+                                </textarea>
+                            </div>
+
+                            <div class="mb-3">
                                 <label>Stok</label>
                                 <input type="number" name="stok"
                                     value="{{ old('stok', $buku->stok) }}"

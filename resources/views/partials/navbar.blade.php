@@ -63,12 +63,12 @@
                         </li>
                         <li>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">
+                            {{-- <a class="dropdown-item" href="#">
                                 <i class="fa fa-user me-2"></i> My Profile
                             </a>
                             <a class="dropdown-item" href="#">
                                 <i class="fa fa-cog me-2"></i> Account Setting
-                            </a>
+                            </a> --}}
                             <div class="dropdown-divider"></div>
                             <!-- Form Logout -->
                             <form action="{{ route('logout') }}" method="POST">

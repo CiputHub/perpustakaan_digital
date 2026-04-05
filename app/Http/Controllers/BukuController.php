@@ -29,7 +29,8 @@ class BukuController extends Controller
             'penulis'       => 'required|min:5',
             'penerbit'      => 'required|min:3',
             'tahun_terbit'  =>'required|date',
-            'stok'          =>'required|min:1'
+            'stok'          =>'required|min:1',
+            'deskripsi'     =>'required|min:1'
         ]);
 
         $gambar = $request->file('gambar');
@@ -41,7 +42,8 @@ class BukuController extends Controller
             'penulis'       => $request->penulis,
             'penerbit'      => $request->penerbit,
             'tahun_terbit'  => $request->tahun_terbit,
-            'stok'          => $request->stok
+            'stok'          => $request->stok,
+            'deskripsi'     => $request->deskripsi
         ]);
 
         //redirect to index
@@ -68,7 +70,8 @@ public function show(string $id): View
         'penulis'      => 'required|min:3',
         'penerbit'     => 'required|min:3',
         'tahun_terbit' => 'required|date',
-        'stok'         => 'required|integer|min:1'
+        'stok'         => 'required|integer|min:1',
+        'deskripsi'    => 'required|min:1'
     ]);
 
     //get product by ID
@@ -92,7 +95,8 @@ public function show(string $id): View
                 'penulis'       => $request->penulis,
                 'penerbit'      => $request->penerbit,
                 'tahun_terbit'  => $request->tahun_terbit,
-                'stok'          => $request->stok
+                'stok'          => $request->stok,
+                'deskripsi'     => $request->deskripsi
             ]);
         } else {
 
@@ -102,7 +106,8 @@ public function show(string $id): View
                 'penulis'       => $request->penulis,
                 'penerbit'      => $request->penerbit,
                 'tahun_terbit'  => $request->tahun_terbit,
-                'stok'          => $request->stok
+                'stok'          => $request->stok,
+                'deskripsi'     => $request->deskripsi
             ]);
         }
 

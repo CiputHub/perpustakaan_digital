@@ -3,7 +3,7 @@
 @section('content')
 
 <!-- Carousel Start -->
-<div class="container-fluid p-0 wow fadeIn" data-wow-delay="0.1s">
+<div id="home" class="container-fluid p-0 wow fadeIn" data-wow-delay="0.1s">
     <div class="owl-carousel header-carousel py-5">
         @foreach($buku as $key => $row)
         <div class="container py-5">
@@ -24,7 +24,10 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="carousel-img text-center">
-                        <img class="img-fluid rounded-4 shadow-lg" src="{{ asset('/storage/buku/'.$row->gambar) }}" alt="{{ $row->judul }}" style="max-height: 400px; object-fit: cover; border-radius: 20px;">
+                       <img class="img-fluid shadow-lg"
+     src="{{ asset('/storage/buku/'.$row->gambar) }}"
+     alt="{{ $row->judul }}"
+     style="max-height:400px; width:100%; object-fit:contain;">
                     </div>
                 </div>
             </div>
@@ -40,37 +43,49 @@
         <div class="col-md-3 col-6">
             <div class="bg-primary bg-gradient text-white rounded-4 p-4 text-center shadow-sm">
                 <i class="fas fa-book fa-3x mb-2 opacity-75"></i>
-                <h3 class="fw-bold mb-0">{{ $totalBuku ?? $buku->count() }}</h3>
+                <h3 class="fw-bold mb-0">{{ $totalBuku }}</h3>
                 <small>Total Buku</small>
             </div>
         </div>
         <div class="col-md-3 col-6">
             <div class="bg-secondary bg-gradient text-white rounded-4 p-4 text-center shadow-sm">
                 <i class="fas fa-users fa-3x mb-2 opacity-75"></i>
-                <h3 class="fw-bold mb-0">{{ $totalAnggota ?? 0 }}</h3>
+                <h3 class="fw-bold mb-0">{{ $totalAnggota }}</h3>
                 <small>Anggota Aktif</small>
             </div>
         </div>
         <div class="col-md-3 col-6">
             <div class="bg-success bg-gradient text-white rounded-4 p-4 text-center shadow-sm">
                 <i class="fas fa-hand-peace fa-3x mb-2 opacity-75"></i>
-                <h3 class="fw-bold mb-0">{{ $totalPinjaman ?? 0 }}</h3>
+                <h3 class="fw-bold mb-0">{{ $totalPinjaman }}</h3>
                 <small>Buku Dipinjam</small>
             </div>
         </div>
         <div class="col-md-3 col-6">
             <div class="bg-warning bg-gradient text-dark rounded-4 p-4 text-center shadow-sm">
-                <i class="fas fa-clock fa-3x mb-2 opacity-75"></i>
-                <h3 class="fw-bold mb-0">{{ $totalKembali ?? 0 }}</h3>
-                <small>Dikembalikan</small>
+                <i class="fas fa-book-reader fa-3x mb-2"></i>
+
+               @auth
+                    <h6 class="fw-bold">Ayo mulai membaca!</h6>
+                    <a href="{{ route('buku.index') }}" class="btn btn-dark btn-sm rounded-pill">
+                        Baca Sekarang
+                    </a>
+                @else
+                    <h6 class="fw-bold">Gabung sekarang!</h6>
+                    <a href="{{ route('register_anggota') }}" class="btn btn-dark btn-sm rounded-pill">
+                        Daftar Sekarang
+                    </a>
+                @endauth
+
             </div>
         </div>
     </div>
 </div>
 <!-- Statistik End -->
 
+
 <!-- Buku Terbaru Start -->
-<div class="container py-5">
+<div id="buku" class="container py-5">
     <div class="text-center mb-5">
         <span class="badge bg-primary px-3 py-2 rounded-pill mb-2">Koleksi Terbaru</span>
         <h2 class="fw-bold display-6">BUKU TERBARU</h2>
@@ -84,9 +99,8 @@
                 <div class="position-relative overflow-hidden rounded-top-4">
                     <a href="{{ route('detail', $item->id_buku) }}">
                         <img src="{{ asset('/storage/buku/'.$item->gambar) }}"
-                             class="card-img-top"
-                             alt="{{ $item->judul }}"
-                             style="height: 280px; width: 100%; object-fit: cover; transition: transform 0.3s;">
+                        class="card-img-top p-3"
+                        style="height:250px; width:100%; object-fit:contain;">
                     </a>
                     @if($item->stok > 0)
                     <span class="position-absolute top-0 end-0 m-3 badge bg-success rounded-pill px-3 py-2">
@@ -143,34 +157,7 @@
 </div>
 <!-- Buku Terbaru End -->
 
-<!-- Kategori Populer Start -->
-<div class="container py-5 bg-light rounded-4 my-4">
-    <div class="text-center mb-5">
-        <span class="badge bg-secondary px-3 py-2 rounded-pill mb-2">Kategori</span>
-        <h2 class="fw-bold display-6">KATEGORI POPULER</h2>
-        <p class="text-muted">Jelajahi buku berdasarkan kategori favorit Anda</p>
-    </div>
 
-    <div class="row g-4">
-        @php
-            $kategoris = ['Fiksi', 'Non Fiksi', 'Pendidikan', 'Teknologi', 'Agama', 'Sejarah'];
-        @endphp
-        @foreach($kategoris as $kat)
-        <div class="col-md-4 col-lg-2">
-            <div class="category-card text-center p-4 rounded-4 bg-white shadow-sm hover-category">
-                <div class="category-icon mb-3">
-                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3">
-                        <i class="fas fa-tag fa-2x text-primary"></i>
-                    </div>
-                </div>
-                <h6 class="mb-0 fw-bold">{{ $kat }}</h6>
-                <small class="text-muted">12 Buku</small>
-            </div>
-        </div>
-        @endforeach
-    </div>
-</div>
-<!-- Kategori Populer End -->
 
 <!-- Call to Action Start -->
 <div class="container py-5">

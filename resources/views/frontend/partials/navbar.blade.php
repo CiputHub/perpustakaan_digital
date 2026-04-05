@@ -12,8 +12,8 @@
                 </button>
               <div class="collapse navbar-collapse" id="navbarCollapse">
     <div class="navbar-nav me-auto">
-        <a href="{{ url('/') }}" class="nav-item nav-link active">Home</a>
-        <a href="{{ url('/semua-buku') }}" class="nav-item nav-link">Semua Buku</a>
+        <a href="#home" class="nav-item nav-link active">Home</a>
+        <a href="#buku" class="nav-item nav-link">Buku Terbaru</a>
         <a href="#" class="nav-item nav-link">Buku</a>
     </div>
 

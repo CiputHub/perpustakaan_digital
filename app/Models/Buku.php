@@ -17,8 +17,14 @@ class Buku extends Model
         'penulis',
         'penerbit',
         'tahun_terbit',
-        'stok'
+        'stok',
+        'deskripsi'
     ];
 
      public $timestamps = false;
+
+     public function peminjaman()
+{
+    return $this->hasMany(Peminjaman::class, 'buku_id', 'id_buku');
+}
 }

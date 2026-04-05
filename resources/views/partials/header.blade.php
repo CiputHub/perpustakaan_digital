@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Kaiadmin - Bootstrap 5 Admin Dashboard</title>
+  <title>BECKEND PERPUSTAKAAN DIGITAL</title>
   <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
 
   <!-- Favicon -->
-  <link rel="icon" href="{{ asset('assets/img/kaiadmin/favicon.ico') }}" type="image/x-icon"/>
+  <link rel="icon" href="{{ asset('assets/img/kaiadmin/favicon-asli1.png') }}" type="image/x-icon"/>
 
   <!-- Fonts and icons -->
   <script src="{{ asset('assets/js/plugin/webfont/webfont.min.js') }}"></script>

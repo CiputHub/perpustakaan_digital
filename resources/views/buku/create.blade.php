@@ -88,6 +88,20 @@
                             </div>
 
                               <div class="form-group mb-3">
+                                <label class="font-weight-bold">Deskripsi</label>
+                                <textarea class="form-control @error('deskripsi') is-invalid @enderror"
+                                name="deskripsi" value=" {{ old('deskripsi') }}"
+                                    placeholder="Masukkan deskripsi">
+                                </textarea>
+                                <!-- error message untuk deskripsi -->
+                                @error('deskripsi')
+                                    <div class="alert alert-danger mt-2">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                              <div class="form-group mb-3">
                                 <label class="font-weight-bold">Stok</label>
                                 <input type="number" class="form-control @error('stok') is-invalid @enderror"
                                 name="stok" value=" {{ old('stok') }}"

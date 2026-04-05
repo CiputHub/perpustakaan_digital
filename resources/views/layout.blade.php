@@ -7,12 +7,12 @@
     <div class="sidebar" data-background-color="dark">
         <div class="sidebar-logo">
             <div class="logo-header" data-background-color="dark">
-                <a href="{{ url('/') }}" class="logo">
+                <a href="{{ url('/dashboard') }}" class="logo">
                     <img
-                        src="{{ asset('assets/img/kaiadmin/logo_light.svg') }}"
+                        src="{{ asset('assets/img/kaiadmin/logo-perpus1.png') }}"
                         alt="navbar brand"
                         class="navbar-brand"
-                        height="20"
+                        height="70"
                     />
                 </a>
                 <div class="nav-toggle">

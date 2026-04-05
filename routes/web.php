@@ -110,4 +110,9 @@ Route::get('/peminjaman/{id}/form-kembali', [PeminjamanController::class, 'formK
     ->name('peminjaman.formKembali');
 
 
+    //LAPORAN PEMINJAMAN
+   Route::middleware(['auth','role:kepala_perpus,petugas'])->group(function () {
+    Route::resource('laporan', \App\Http\Controllers\LaporanController::class);
+});
+
 

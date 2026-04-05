@@ -23,7 +23,6 @@
                     <th>Gambar</th>
                     <th>Penulis</th>
                     <th>Penerbit</th>
-                    <th>Tahun Terbit</th>
                     <th>Stok</th>
                     <th>Aksi</th>
                 </tr>
@@ -38,7 +37,6 @@
                 </td>
                 <td>{{ $row->penulis }}</td>
                 <td>{{ $row->penerbit }}</td>
-                <td>{{ $row->tahun_terbit }}</td>
                 <td>{{ $row->stok }}</td>
 
                 <td>

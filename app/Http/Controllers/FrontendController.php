@@ -2,16 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Anggota;
 use App\Models\Buku;
+use App\Models\Peminjaman;
 
 
 class FrontendController extends Controller
 {
-    public function index()
+
+public function index()
 {
-    $buku = Buku::orderBy('id_buku', 'desc')->get();
-    return view('frontend.view.index', compact('buku'));
+   $buku = Buku::orderBy('id_buku', 'desc')->get();
+
+    $totalBuku = Buku::count();
+    $totalAnggota = Anggota::count();
+    $totalPinjaman = Peminjaman::where('status','dipinjam')->count();
+    $totalKembali = Peminjaman::where('status','dikembalikan')->count();
+
+    return view('frontend.view.index', compact(
+        'buku',
+        'totalBuku',
+        'totalAnggota',
+        'totalPinjaman',
+        'totalKembali'
+    ));
 }
+
+
 
 public function detail($id)
 {
