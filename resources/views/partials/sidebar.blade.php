@@ -14,7 +14,7 @@
         </a>
       </li>
 
-      {{-- PEMINJAMAN (kepala + petugas) --}}
+      {{-- PEMINJAMAN (petugas) --}}
       @if(in_array($role, ['petugas']))
       <li class="nav-item {{ request()->routeIs('peminjaman.*') ? 'active' : '' }}">
         <a href="{{ route('peminjaman.index') }}">
@@ -54,12 +54,22 @@
       </li>
       @endif
 
-      {{-- Anggota (khusus petugas) --}}
+      {{-- laporan ( petugas, kepala perpus) --}}
        @if(in_array($role, ['kepala_perpus','petugas']))
       <li class="nav-item {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
         <a href="{{ route('laporan.index') }}">
           <i class="fas fa-address-book"></i>
           <p>Laporan</p>
+        </a>
+      </li>
+      @endif
+
+       {{-- kategori (petugas) --}}
+      @if(in_array($role, ['petugas']))
+      <li class="nav-item {{ request()->routeIs('kategori.*') ? 'active' : '' }}">
+        <a href="{{ route('kategori.index') }}">
+          <i class="fas fa-folder-open"></i>
+          <p>Kategori</p>
         </a>
       </li>
       @endif

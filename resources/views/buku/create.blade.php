@@ -89,10 +89,7 @@
 
                               <div class="form-group mb-3">
                                 <label class="font-weight-bold">Deskripsi</label>
-                                <textarea class="form-control @error('deskripsi') is-invalid @enderror"
-                                name="deskripsi" value=" {{ old('deskripsi') }}"
-                                    placeholder="Masukkan deskripsi">
-                                </textarea>
+                                <textarea name="deskripsi" class="form-control">{{ old('deskripsi') }}</textarea>
                                 <!-- error message untuk deskripsi -->
                                 @error('deskripsi')
                                     <div class="alert alert-danger mt-2">
@@ -114,6 +111,15 @@
                                     </div>
                                 @enderror
                             </div>
+
+                            <select name="kategori_id" class="form-control" required>
+                                <option value="">-- Pilih Kategori --</option>
+                                @foreach($kategori as $k)
+                                    <option value="{{ $k->id }}">
+                                        {{ $k->nama_kategori }}
+                                    </option>
+                                @endforeach
+                            </select>
 
 
 

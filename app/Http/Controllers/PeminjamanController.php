@@ -6,6 +6,7 @@ use App\Models\Anggota;
 use App\Models\Buku;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class PeminjamanController extends Controller
@@ -85,14 +86,16 @@ public function store(Request $request)
         return back()->with('error', 'Maksimal peminjaman 3 buku!');
     }
 
-    // ✅ HANYA SEKALI
-    Peminjaman::create([
-        'buku_id' => $buku->id_buku,
-        'anggota_id' => $anggota->id_anggota,
-        'tanggal_pinjam' => $request->tanggal_pinjam,
-        'tanggal_pengembalian' => $request->tanggal_pengembalian,
-        'status' => 'menunggu'
-    ]);
+   $user = Auth::guard('anggota')->user();
+
+Peminjaman::create([
+    'buku_id' => $buku->id_buku,
+    'anggota_id' => $anggota->id_anggota,
+    'user_id' => $user->id, // ✅ FIX DI SINI
+    'tanggal_pinjam' => $request->tanggal_pinjam,
+    'tanggal_pengembalian' => $request->tanggal_pengembalian,
+    'status' => 'menunggu'
+]);
 
     return redirect('/')->with('success', 'Menunggu konfirmasi petugas');
 }
@@ -139,16 +142,16 @@ public function kembalikan($id)
     return back()->with('error', 'Tanggal pengembalian tidak valid');
 }
 
-$tglKembali = \Carbon\Carbon::parse($pinjam->tanggal_pengembalian);
+$today = now()->startOfDay();
+$tglKembali = \Carbon\Carbon::parse($pinjam->tanggal_pengembalian)->startOfDay();
 
-        $denda = 0;
+$hariTelat = 0;
+$denda = 0;
 
-        if ($today->gt($tglKembali)) {
-            $hariTelat = $tglKembali->diffInDays($today);
-            $denda = $hariTelat * 2000;
-        } else {
-            $denda = 0;
-        }
+if ($today->gt($tglKembali)) {
+    $hariTelat = $tglKembali->diffInDays($today);
+    $denda = $hariTelat * 2000;
+}
 
         // 🔥 STATUS SELALU DIKEMBALIKAN
         $pinjam->status = 'dikembalikan';
@@ -173,8 +176,8 @@ public function formKembali($id)
 {
     $pinjam = Peminjaman::with('buku', 'anggota')->findOrFail($id);
 
-    $today = now();
-    $tglKembali = \Carbon\Carbon::parse($pinjam->tanggal_pengembalian);
+    $today = now()->startOfDay();
+    $tglKembali = Carbon::parse($pinjam->tanggal_pengembalian)->startOfDay();
 
     $hariTelat = 0;
     $denda = 0;

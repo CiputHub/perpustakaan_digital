@@ -3,17 +3,20 @@
 @section('content')
 
 <!-- Carousel Start -->
-<div id="home" class="container-fluid p-0 wow fadeIn" data-wow-delay="0.1s">
+<div id="home" class="container-fluid p-0 wow fadeIn" data-wow-delay="0.1s" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
     <div class="owl-carousel header-carousel py-5">
-        @foreach($buku as $key => $row)
-        <div class="container py-5">
+        @foreach($buku->take(5) as $key => $row)
+        <div class="container py-4">
             <div class="row g-5 align-items-center">
-                <div class="col-lg-6">
+                <div class="col-lg-6 order-lg-1 order-2">
                     <div class="carousel-text">
-                        <h1 class="display-1 text-uppercase mb-4 fw-bold">{{ $row->judul }}</h1>
-                        <p class="mb-4 text-muted">{{ Str::limit($row->deskripsi ?? 'Nikmati pengalaman membaca yang menyenangkan dengan koleksi buku terbaik kami.', 120) }}</p>
+                        <small class="text-primary text-uppercase fw-bold mb-3 d-block">
+                            <i class="fas fa-star me-1"></i> Buku Pilihan
+                        </small>
+                        <h1 class="display-3 fw-bold mb-4">{{ $row->judul }}</h1>
+                        <p class="mb-4 text-secondary">{{ Str::limit($row->deskripsi ?? 'Nikmati pengalaman membaca yang menyenangkan dengan koleksi buku terbaik kami.', 120) }}</p>
                         <div class="d-flex flex-wrap gap-3">
-                            <a class="btn btn-primary py-3 px-5 rounded-pill shadow-sm" href="#!">
+                            <a class="btn btn-primary py-3 px-5 rounded-pill shadow-sm" href="#">
                                 <i class="fas fa-book-open me-2"></i>Pinjam Sekarang
                             </a>
                             <a class="btn btn-outline-secondary py-3 px-5 rounded-pill" href="{{ route('detail', $row->id_buku) }}">
@@ -22,12 +25,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6 order-lg-2 order-1">
                     <div class="carousel-img text-center">
-                       <img class="img-fluid shadow-lg"
-     src="{{ asset('/storage/buku/'.$row->gambar) }}"
-     alt="{{ $row->judul }}"
-     style="max-height:400px; width:100%; object-fit:contain;">
+                        <img class="img-fluid rounded-4 shadow-lg"
+                             src="{{ asset('/storage/buku/'.$row->gambar) }}"
+                             alt="{{ $row->judul }}"
+                             style="max-height: 450px; width: auto; max-width: 100%; object-fit: contain; border-radius: 20px;">
                     </div>
                 </div>
             </div>
@@ -43,32 +46,31 @@
         <div class="col-md-3 col-6">
             <div class="bg-primary bg-gradient text-white rounded-4 p-4 text-center shadow-sm">
                 <i class="fas fa-book fa-3x mb-2 opacity-75"></i>
-                <h3 class="fw-bold mb-0">{{ $totalBuku }}</h3>
+                <h3 class="fw-bold mb-0">{{ $totalBuku ?? 0 }}</h3>
                 <small>Total Buku</small>
             </div>
         </div>
         <div class="col-md-3 col-6">
             <div class="bg-secondary bg-gradient text-white rounded-4 p-4 text-center shadow-sm">
                 <i class="fas fa-users fa-3x mb-2 opacity-75"></i>
-                <h3 class="fw-bold mb-0">{{ $totalAnggota }}</h3>
+                <h3 class="fw-bold mb-0">{{ $totalAnggota ?? 0 }}</h3>
                 <small>Anggota Aktif</small>
             </div>
         </div>
         <div class="col-md-3 col-6">
             <div class="bg-success bg-gradient text-white rounded-4 p-4 text-center shadow-sm">
                 <i class="fas fa-hand-peace fa-3x mb-2 opacity-75"></i>
-                <h3 class="fw-bold mb-0">{{ $totalPinjaman }}</h3>
+                <h3 class="fw-bold mb-0">{{ $totalPinjaman ?? 0 }}</h3>
                 <small>Buku Dipinjam</small>
             </div>
         </div>
         <div class="col-md-3 col-6">
             <div class="bg-warning bg-gradient text-dark rounded-4 p-4 text-center shadow-sm">
                 <i class="fas fa-book-reader fa-3x mb-2"></i>
-
-               @auth
+                @auth('anggota')
                     <h6 class="fw-bold">Ayo mulai membaca!</h6>
-                    <a href="{{ route('buku.index') }}" class="btn btn-dark btn-sm rounded-pill">
-                        Baca Sekarang
+                    <a href="{{ route('semua.buku') }}" class="btn btn-dark btn-sm rounded-pill">
+                        Pinjam Sekarang
                     </a>
                 @else
                     <h6 class="fw-bold">Gabung sekarang!</h6>
@@ -76,15 +78,13 @@
                         Daftar Sekarang
                     </a>
                 @endauth
-
             </div>
         </div>
     </div>
 </div>
 <!-- Statistik End -->
 
-
-<!-- Buku Terbaru Start -->
+<!-- Buku Terbaru Start (Tampilan Awal yang Bagus) -->
 <div id="buku" class="container py-5">
     <div class="text-center mb-5">
         <span class="badge bg-primary px-3 py-2 rounded-pill mb-2">Koleksi Terbaru</span>
@@ -99,8 +99,8 @@
                 <div class="position-relative overflow-hidden rounded-top-4">
                     <a href="{{ route('detail', $item->id_buku) }}">
                         <img src="{{ asset('/storage/buku/'.$item->gambar) }}"
-                        class="card-img-top p-3"
-                        style="height:250px; width:100%; object-fit:contain;">
+                             class="card-img-top p-3"
+                             style="height:250px; width:100%; object-fit:contain;">
                     </a>
                     @if($item->stok > 0)
                     <span class="position-absolute top-0 end-0 m-3 badge bg-success rounded-pill px-3 py-2">
@@ -115,7 +115,7 @@
 
                 <div class="card-body d-flex flex-column">
                     <h6 class="fw-bold mb-2">
-                        <a href="{{ route('detail', $item->id_buku) }}" class="text-dark text-decoration-none stretched-link">
+                        <a href="{{ route('detail', $item->id_buku) }}" class="text-dark text-decoration-none">
                             {{ Str::limit($item->judul, 40) }}
                         </a>
                     </h6>
@@ -157,7 +157,32 @@
 </div>
 <!-- Buku Terbaru End -->
 
+<!-- Kategori Populer Start (Tanpa Icon, Hanya Nama) -->
+<div id="kategori" class="container py-5 bg-light rounded-4 my-4">
+    <div class="text-center mb-5">
+        <span class="badge bg-secondary px-3 py-2 rounded-pill mb-2">Kategori</span>
+        <h2 class="fw-bold display-6">KATEGORI POPULER</h2>
+        <p class="text-muted">Jelajahi buku berdasarkan kategori favorit Anda</p>
+    </div>
 
+    <div class="row g-4 justify-content-center">
+        @forelse($kategoris as $kat)
+        <div class="col-md-4 col-lg-2">
+            <a href="{{ route('kategori.buku', $kat->id) }}" class="text-decoration-none">
+                <div class="category-card text-center p-4 rounded-4 bg-white shadow-sm hover-category">
+                    <h6 class="mb-1 fw-bold text-dark">{{ $kat->nama_kategori }}</h6>
+                    <small class="text-muted">{{ $kat->buku_count ?? 0 }} Buku</small>
+                </div>
+            </a>
+        </div>
+        @empty
+        <div class="col-12 text-center">
+            <p class="text-muted">Belum ada kategori</p>
+        </div>
+        @endforelse
+    </div>
+</div>
+<!-- Kategori Populer End -->
 
 <!-- Call to Action Start -->
 <div class="container py-5">
@@ -172,7 +197,7 @@
                         <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
                     </a>
                     <a href="{{ route('login_anggota') }}" class="btn btn-outline-light px-4 py-2 rounded-pill">
-                        <i class="fas fa-info-circle me-2"></i>Login Sekarang
+                        <i class="fas fa-sign-in-alt me-2"></i>Login Sekarang
                     </a>
                 </div>
             </div>
@@ -204,13 +229,11 @@
     .category-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
-    }
-
-    .hover-category:hover .category-icon .rounded-circle {
         background-color: var(--bs-primary) !important;
     }
 
-    .hover-category:hover .category-icon i {
+    .category-card:hover h6,
+    .category-card:hover small {
         color: white !important;
     }
 
@@ -268,15 +291,58 @@
         justify-content: center;
         gap: 8px;
     }
+
+    /* Smooth Scroll */
+    html {
+        scroll-behavior: smooth;
+    }
 </style>
 
 <script>
     function pinjamBuku(id) {
-        // Anda bisa custom alert atau redirect sesuai kebutuhan
         if(confirm('Apakah Anda ingin meminjam buku ini?')) {
             window.location.href = "{{ url('pinjam') }}/" + id;
         }
     }
+</script>
+
+<script>
+    // Smooth scroll untuk navigasi
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
+
+<script>
+    // Active link on scroll
+    const sections = document.querySelectorAll("div[id]");
+    const navLinks = document.querySelectorAll(".nav-link");
+
+    window.addEventListener("scroll", () => {
+        let current = "";
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            const sectionHeight = section.clientHeight;
+            if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+                current = section.getAttribute("id");
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove("active");
+            if (link.getAttribute("href") === "#" + current) {
+                link.classList.add("active");
+            }
+        });
+    });
 </script>
 
 @endsection

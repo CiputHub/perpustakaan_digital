@@ -70,9 +70,7 @@
                                 Kembali
                             </a>
 
-                            <a href="{{ route('anggota.edit', $anggota->id_anggota) }}" class="btn btn-warning">
-                                Edit
-                            </a>
+                          
                         </div>
 
                     </div>

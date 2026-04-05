@@ -100,11 +100,11 @@
             </div>
             <div class="card-body p-4 pt-0">
                 <div class="table-responsive">
-                    <table
+                   <table
                         id="basic-datatables"
                         class="display table table-striped table-hover"
                       >
-                        <thead class="table-dark">
+                        <thead>
                             <tr>
                                 <th style="width: 50px;">No</th>
 
@@ -112,7 +112,6 @@
                                 <th>Judul Buku</th>
                                 <th>Tanggal Pinjam</th>
                                 <th>Tanggal Kembali</th>
-                                <th>Total Pinjam</th>
                                 <th>Denda</th>
                                 <th>Status</th>
                                 <th style="width: 80px;">Aksi</th>
@@ -136,7 +135,7 @@
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ $row->total_pinjam ?? 1 }}</td>
+                               
                                 <td>
                                     @if($row->denda && $row->denda > 0)
                                         <span class="text-danger fw-bold">Rp {{ number_format($row->denda, 0, ',', '.') }}</span>

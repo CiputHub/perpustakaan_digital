@@ -4,22 +4,26 @@ namespace App\Http\Controllers;
 
 use Illuminate\View\View;
 use App\Models\Buku;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 
 class BukuController extends Controller
 {
-    public function index()
+   public function index()
     {
         $buku = Buku::all();
-        return view('buku.index', compact('buku'));
+        $kategori = Kategori::all();
+
+        return view('buku.index', compact('buku', 'kategori'));
     }
 
-      public function create(): View
-    {
-        return view('buku.create');
-    }
+        public function create(): View
+        {
+            $kategori = Kategori::all();
+            return view('buku.create', compact('kategori'));
+        }
 
      public function store(Request $request): RedirectResponse
     {
@@ -30,7 +34,9 @@ class BukuController extends Controller
             'penerbit'      => 'required|min:3',
             'tahun_terbit'  =>'required|date',
             'stok'          =>'required|min:1',
-            'deskripsi'     =>'required|min:1'
+            'deskripsi'     =>'required|min:1',
+            'kategori_id'     =>'required'
+
         ]);
 
         $gambar = $request->file('gambar');
@@ -43,7 +49,8 @@ class BukuController extends Controller
             'penerbit'      => $request->penerbit,
             'tahun_terbit'  => $request->tahun_terbit,
             'stok'          => $request->stok,
-            'deskripsi'     => $request->deskripsi
+            'deskripsi'     => $request->deskripsi,
+            'kategori_id'     => $request->kategori_id
         ]);
 
         //redirect to index
@@ -59,7 +66,9 @@ public function show(string $id): View
     public function edit(string $id): View
     {
         $buku = Buku::findOrFail($id);
-          return view("buku.edit", compact('buku'));
+        $kategori = Kategori::all(); // 🔥 ambil semua kategori
+
+    return view("buku.edit", compact('buku', 'kategori'));
     }
 
    public function update(Request $request, $id): RedirectResponse
@@ -71,7 +80,8 @@ public function show(string $id): View
         'penerbit'     => 'required|min:3',
         'tahun_terbit' => 'required|date',
         'stok'         => 'required|integer|min:1',
-        'deskripsi'    => 'required|min:1'
+        'deskripsi'    => 'required|min:1',
+        'kategori_id'    => 'required'
     ]);
 
     //get product by ID
@@ -96,7 +106,8 @@ public function show(string $id): View
                 'penerbit'      => $request->penerbit,
                 'tahun_terbit'  => $request->tahun_terbit,
                 'stok'          => $request->stok,
-                'deskripsi'     => $request->deskripsi
+                'deskripsi'     => $request->deskripsi,
+                'kategori_id'     => $request->kategori_id
             ]);
         } else {
 
@@ -107,7 +118,8 @@ public function show(string $id): View
                 'penerbit'      => $request->penerbit,
                 'tahun_terbit'  => $request->tahun_terbit,
                 'stok'          => $request->stok,
-                'deskripsi'     => $request->deskripsi
+                'deskripsi'     => $request->deskripsi,
+                'kategori_id'     => $request->kategori_id
             ]);
         }
 

@@ -34,7 +34,7 @@ class PetugasController extends Controller
     'password' => 'required|min:2',
 
     'nama' => 'required|min:3|max:100',
-    'no_telepon' => 'required|numeric|digits_between:10,15|unique:petugas,no_telepon',
+    'no_telepon' => 'required|min:3|max:15|unique:petugas,no_telepon',
     'alamat' => 'required|min:5'
 ], [
     // custom message biar jelas 🔥
@@ -47,7 +47,7 @@ class PetugasController extends Controller
     'email.unique' => 'Email sudah terdaftar!',
 
     'password.required' => 'Password wajib diisi!',
-    'password.min' => 'Password minimal 6 karakter!',
+    'password.min' => 'Password minimal 2 karakter!',
 
     'nama.required' => 'Nama wajib diisi!',
 

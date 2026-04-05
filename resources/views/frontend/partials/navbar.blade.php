@@ -12,9 +12,9 @@
                 </button>
               <div class="collapse navbar-collapse" id="navbarCollapse">
     <div class="navbar-nav me-auto">
-        <a href="#home" class="nav-item nav-link active">Home</a>
+        <a href="#home" class="nav-item nav-link">Home</a>
         <a href="#buku" class="nav-item nav-link">Buku Terbaru</a>
-        <a href="#" class="nav-item nav-link">Buku</a>
+        <a href="#kategori" class="nav-item nav-link">Kategori</a>
     </div>
 
     <!-- USER LOGIN -->

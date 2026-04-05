@@ -18,7 +18,8 @@ class Buku extends Model
         'penerbit',
         'tahun_terbit',
         'stok',
-        'deskripsi'
+        'deskripsi',
+        'kategori_id'
     ];
 
      public $timestamps = false;
@@ -27,4 +28,14 @@ class Buku extends Model
 {
     return $this->hasMany(Peminjaman::class, 'buku_id', 'id_buku');
 }
+
+public function kategori()
+{
+    return $this->belongsTo(Kategori::class, 'kategori_id');
+}
+
+public function user(){
+    return $this->belongsTo(User::class);
+}
+
 }

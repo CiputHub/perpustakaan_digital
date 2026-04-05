@@ -42,7 +42,7 @@ class LaporanController extends Controller
 
     public function show($id)
     {
-        $data = Peminjaman::with(['buku','anggota'])->findOrFail($id);
+        $data = Peminjaman::with(['buku','anggota','user'])->findOrFail($id);
         return view('backend.laporan.detail', compact('data'));
     }
 

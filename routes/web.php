@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\PetugasController;
@@ -16,8 +17,16 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
 
-    // login anggota
+Route::resource('kategori', KategoriController::class);
 
+Route::get('/kategori/{id}', [FrontendController::class, 'kategoriBuku'])
+    ->name('kategori.buku');
+
+Route::get('/buku/{id}', [FrontendController::class, 'detail'])
+    ->name('buku.detail');
+
+Route::get('/semua-buku', [FrontendController::class, 'semuaBuku'])
+    ->name('semua.buku');
 
 // dashboard anggota pakai middleware
 Route::prefix('anggota')
@@ -37,7 +46,7 @@ Route::get('/buku/{id}', [FrontendController::class, 'detail'])
     ->name('detail');
 
 
-Route::resource('/petugas', PetugasController::class);
+
 
 Route::resource('/anggota', AnggotaController::class);
 

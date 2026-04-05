@@ -55,6 +55,14 @@
                                             </span>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <th>Kategori</th>
+                                        <td>:
+                                              <span class="badge bg-primary">
+                                                {{ $buku->kategori->nama_kategori }}
+                                            </span>
+                                        </td>
+                                    </tr>
 
                                 </table>
                                 <b>

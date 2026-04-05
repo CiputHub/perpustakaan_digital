@@ -66,10 +66,7 @@
 
                             <div class="mb-3">
                                 <label>Deskripsi</label>
-                                <textarea name="deskripsi"
-                                    value="{{ old('deskripsi', $buku->deskripsi) }}"
-                                    class="form-control">
-                                </textarea>
+                                <textarea name="deskripsi" class="form-control">{{ old('deskripsi', $buku->deskripsi) }}</textarea>
                             </div>
 
                             <div class="mb-3">
@@ -78,6 +75,16 @@
                                     value="{{ old('stok', $buku->stok) }}"
                                     class="form-control">
                             </div>
+
+                            <select name="kategori_id" class="form-control" required>
+                                <option value="">-- Pilih Kategori --</option>
+                                @foreach($kategori as $k)
+                                    <option value="{{ $k->id }}"
+                                        {{ $buku->kategori_id == $k->id ? 'selected' : '' }}>
+                                        {{ $k->nama_kategori }}
+                                    </option>
+                                @endforeach
+                            </select>
 
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
