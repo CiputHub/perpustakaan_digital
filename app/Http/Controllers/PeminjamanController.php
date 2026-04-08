@@ -58,10 +58,10 @@ $anggota = Anggota::where('user_id', $user->id)->first();
 public function store(Request $request)
 {
     $request->validate([
-        'buku_id' => 'required',
-        'tanggal_pinjam' => 'required|date',
-        'tanggal_pengembalian' => 'required|date',
-    ]);
+    'buku_id' => 'required',
+    'tanggal_pinjam' => 'required|date|after_or_equal:today',
+    'tanggal_pengembalian' => 'required|date|after_or_equal:today|before_or_equal:' . now()->addDays(7)->format('Y-m-d'),
+]);
 
     $buku = Buku::findOrFail($request->buku_id);
 
@@ -92,7 +92,7 @@ Peminjaman::create([
     'buku_id' => $buku->id_buku,
     'anggota_id' => $anggota->id_anggota,
     'user_id' => $user->id, // ✅ FIX DI SINI
-    'tanggal_pinjam' => $request->tanggal_pinjam,
+    'tanggal_pinjam' => now(),
     'tanggal_pengembalian' => $request->tanggal_pengembalian,
     'status' => 'menunggu'
 ]);

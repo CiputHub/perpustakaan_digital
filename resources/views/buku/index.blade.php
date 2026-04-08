@@ -10,6 +10,23 @@
                        <h3 class="fw-bold mb-4">Data Buku</h3>
                   </div>
                   <div class="card-body">
+                    {{-- ALERT SUCCESS --}}
+@if(session('success'))
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle me-2"></i>
+    {{ session('success') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+@endif
+
+{{-- ALERT ERROR --}}
+@if(session('error'))
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ session('error') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+@endif
                     <div class="table-responsive">
                       <table
                         id="basic-datatables"
@@ -56,6 +73,11 @@
                         @csrf
                         @method('DELETE')
 
+                        @php
+                        $dipakai = \App\Models\Peminjaman::where('buku_id', $row->id_buku)
+                            ->whereIn('status', ['dipinjam', 'terlambat'])
+                            ->exists();
+                        @endphp
                         <button type="submit" class="btn btn-sm btn-danger">
                             Hapus
                         </button>

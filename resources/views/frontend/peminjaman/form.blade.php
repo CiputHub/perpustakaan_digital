@@ -36,17 +36,26 @@
             </div>
 
             <!-- TANGGAL -->
-            <div class="row">
-                <div class="col-md-6">
-                    <label>Tanggal Pinjam</label>
-                    <input type="date" name="tanggal_pinjam" class="form-control" required>
-                </div>
+<div class="row">
+    <div class="col-md-6">
+        <label>Tanggal Pinjam</label>
+        <input type="date"
+               name="tanggal_pinjam"
+               class="form-control"
+               value="{{ date('Y-m-d') }}"
+               readonly>
+    </div>
 
-                <div class="col-md-6">
-                    <label>Tanggal Kembali</label>
-                    <input type="date" name="tanggal_pengembalian" class="form-control" required>
-                </div>
-            </div>
+    <div class="col-md-6">
+        <label>Tanggal Kembali (Max 7 hari)</label>
+        <input type="date"
+               name="tanggal_pengembalian"
+               class="form-control"
+               min="{{ date('Y-m-d') }}"
+               max="{{ date('Y-m-d', strtotime('+7 days')) }}"
+               required>
+    </div>
+</div>
 
             <div class="mt-4">
                 <button class="btn btn-success">📥 Pinjam Sekarang</button>

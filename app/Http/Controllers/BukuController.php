@@ -131,12 +131,22 @@ public function show(string $id): View
     public function destroy($id): RedirectResponse
 {
     $buku = Buku::findOrFail($id);
+
+    // CEK hanya yang masih aktif
+    $dipakai = \App\Models\Peminjaman::where('buku_id', $id)
+        ->whereIn('status', ['dipinjam', 'terlambat'])
+        ->exists();
+
+    if ($dipakai) {
+        return redirect()->route('buku.index')
+            ->with('error', 'Buku tidak bisa dihapus karena masih sedang dipinjam!');
+    }
+
     Storage::disk('public')->delete('buku/' . $buku->gambar);
     $buku->delete();
 
     return redirect()->route('buku.index')
-
-        ->with(['success' => 'Data Berhasil Dihapus!']);
+        ->with('success', 'Data Berhasil Dihapus!');
 }
 
 
