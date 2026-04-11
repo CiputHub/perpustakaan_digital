@@ -1,3 +1,14 @@
+{{--
+    ============================================================
+    SHOW BLADE - Halaman Detail Buku
+    ============================================================
+    Fungsi: Menampilkan detail lengkap satu buku
+    Route: GET /admin/buku/{id}
+    Controller: BukuController@show
+    Data yang dikirim: $buku (satu data buku lengkap dengan relasi kategori)
+    ============================================================
+--}}
+
 @extends('layout')
 
 @section('content')
@@ -17,15 +28,18 @@
 
                             <div class="row">
 
-                                <!-- GAMBAR -->
+                                {{-- ==================== KOLOM GAMBAR ==================== --}}
                                 <div class="col-md-5 text-center">
                                     <img src="{{ asset('storage/buku/' . $buku->gambar) }}"
-                                        class="img-fluid rounded shadow-sm" style="max-height: 350px; object-fit: cover;">
+                                         class="img-fluid rounded shadow-sm"
+                                         style="max-height: 350px; object-fit: cover;"
+                                         alt="Gambar {{ $buku->judul }}">
                                 </div>
 
-                                <!-- DETAIL -->
+                                {{-- ==================== KOLOM DETAIL ==================== --}}
                                 <div class="col-md-7">
 
+                                    {{-- Tabel detail informasi buku --}}
                                     <table class="table table-borderless">
                                         <tr>
                                             <th width="150">Judul</th>
@@ -41,7 +55,7 @@
                                         </tr>
                                         <tr>
                                             <th>Tahun Terbit</th>
-                                            <td>: {{ $buku->tahun_terbit }}</td>
+                                            <td>: {{ \Carbon\Carbon::parse($buku->tahun_terbit)->format('d/m/Y') }}</td>
                                         </tr>
                                         <tr>
                                             <th>Stok</th>
@@ -55,24 +69,28 @@
                                             <th>Kategori</th>
                                             <td>:
                                                 <span class="badge bg-primary">
-                                                    {{ $buku->kategori->nama_kategori }}
+                                                    {{ $buku->kategori->nama_kategori ?? '-' }}
                                                 </span>
                                             </td>
                                         </tr>
-
                                     </table>
-                                    <b>
-                                        <h2> 📚 Deskripsi/Sinopsis Buku: </h2>
-                                        {{ $buku->deskripsi }}
-                                    </b>
 
-                                    <div class="mt-3">
+                                    {{-- Deskripsi / Sinopsis --}}
+                                    <b>
+                                        <h5 class="mt-3">📚 Deskripsi/Sinopsis Buku:</h5>
+                                    </b>
+                                    <p class="text-muted" style="line-height: 1.6;">
+                                        {{ $buku->deskripsi ?? 'Tidak ada deskripsi' }}
+                                    </p>
+
+                                    {{-- ==================== TOMBOL AKSI ==================== --}}
+                                    <div class="mt-3 d-flex gap-2">
                                         <a href="{{ route('buku.index') }}" class="btn btn-secondary">
-                                            Kembali
+                                            <i class="fas fa-arrow-left me-1"></i> Kembali
                                         </a>
 
                                         <a href="{{ route('buku.edit', $buku->id_buku) }}" class="btn btn-warning">
-                                            Edit
+                                            <i class="fas fa-edit me-1"></i> Edit
                                         </a>
                                     </div>
 

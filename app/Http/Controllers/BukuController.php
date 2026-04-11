@@ -11,6 +11,9 @@ use Illuminate\Http\RedirectResponse;
 
 class BukuController extends Controller
 {
+    /**
+     * Menampilkan semua data buku
+     */
     public function index()
     {
         $buku = Buku::all();
@@ -19,141 +22,148 @@ class BukuController extends Controller
         return view('buku.index', compact('buku', 'kategori'));
     }
 
+    /**
+     * Menampilkan form tambah buku
+     */
     public function create(): View
     {
         $kategori = Kategori::all();
         return view('buku.create', compact('kategori'));
     }
 
+    /**
+     * Menyimpan data buku baru
+     */
     public function store(Request $request): RedirectResponse
     {
+        // Validasi input
         $request->validate([
-            'judul'         => 'required|min:3',
-            'gambar'        => 'required|image|mimes:jpeg,jpg,png|max:2048',
-            'penulis'       => 'required|min:5',
-            'penerbit'      => 'required|min:3',
-            'tahun_terbit'  => 'required|date',
-            'stok'          => 'required|min:0',
-            'deskripsi'     => 'required|min:1',
-            'kategori_id'     => 'required'
-
+            'judul' => 'required|min:3',
+            'gambar' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+            'penulis' => 'required|min:5',
+            'penerbit' => 'required|min:3',
+            'tahun_terbit' => 'required|date',
+            'stok' => 'required|min:0',
+            'deskripsi' => 'required|min:1',
+            'kategori_id' => 'required'
         ]);
 
+        // Upload gambar
         $gambar = $request->file('gambar');
-        $path = $gambar->storeAs('buku', $gambar->hashName(), 'public');
+        $gambar->storeAs('buku', $gambar->hashName(), 'public');
 
+        // Simpan ke database
         Buku::create([
-            'judul'         => $request->judul,
-            'gambar'        => $gambar->hashName(),
-            'penulis'       => $request->penulis,
-            'penerbit'      => $request->penerbit,
-            'tahun_terbit'  => $request->tahun_terbit,
-            'stok'          => $request->stok,
-            'deskripsi'     => $request->deskripsi,
-            'kategori_id'     => $request->kategori_id
+            'judul' => $request->judul,
+            'gambar' => $gambar->hashName(),
+            'penulis' => $request->penulis,
+            'penerbit' => $request->penerbit,
+            'tahun_terbit' => $request->tahun_terbit,
+            'stok' => $request->stok,
+            'deskripsi' => $request->deskripsi,
+            'kategori_id' => $request->kategori_id
         ]);
 
-        //redirect to index
-        return redirect()->route('buku.index')->with(['success' => 'Data Berhasil Disimpan!']);
+        return redirect()->route('buku.index')->with('success', 'Data Berhasil Disimpan!');
     }
 
+    /**
+     * Menampilkan detail buku
+     */
     public function show(string $id): View
     {
         $buku = Buku::findOrFail($id);
         return view("buku.show", compact('buku'));
     }
 
+    /**
+     * Menampilkan form edit buku
+     */
     public function edit(string $id): View
     {
         $buku = Buku::findOrFail($id);
-        $kategori = Kategori::all(); // 🔥 ambil semua kategori
+        $kategori = Kategori::all();
 
         return view("buku.edit", compact('buku', 'kategori'));
     }
 
+    /**
+     * Mengupdate data buku
+     */
     public function update(Request $request, $id): RedirectResponse
     {
         $request->validate([
-            'judul'        => 'required|min:3',
-            'gambar'       => 'image|mimes:jpeg,jpg,png|max:2048',
-            'penulis'      => 'required|min:3',
-            'penerbit'     => 'required|min:3',
+            'judul' => 'required|min:3',
+            'gambar' => 'image|mimes:jpeg,jpg,png|max:2048',
+            'penulis' => 'required|min:3',
+            'penerbit' => 'required|min:3',
             'tahun_terbit' => 'required|date',
-            'stok'         => 'required|integer|min:0',
-            'deskripsi'    => 'required|min:1',
-            'kategori_id'    => 'required'
+            'stok' => 'required|integer|min:0',
+            'deskripsi' => 'required',
+            'kategori_id' => 'required'
         ]);
 
-        //get product by ID
         $buku = Buku::findOrFail($id);
 
-        //check if image is uploaded
+        // Jika upload gambar baru
         if ($request->hasFile('gambar')) {
 
-            //delete old image
+            // Hapus gambar lama
             Storage::delete('buku/' . $buku->gambar);
 
-            //upload new image
             $gambar = $request->file('gambar');
             $gambar->storeAs('buku', $gambar->hashName(), 'public');
 
-
-            //update product with new image
             $buku->update([
-                'judul'         => $request->judul,
-                'gambar'        => $gambar->hashName(),
-                'penulis'       => $request->penulis,
-                'penerbit'      => $request->penerbit,
-                'tahun_terbit'  => $request->tahun_terbit,
-                'stok'          => $request->stok,
-                'deskripsi'     => $request->deskripsi,
-                'kategori_id'     => $request->kategori_id
+                'judul' => $request->judul,
+                'gambar' => $gambar->hashName(),
+                'penulis' => $request->penulis,
+                'penerbit' => $request->penerbit,
+                'tahun_terbit' => $request->tahun_terbit,
+                'stok' => $request->stok,
+                'deskripsi' => $request->deskripsi,
+                'kategori_id' => $request->kategori_id
             ]);
         } else {
-
-            //update product without image
-            $buku->update([
-                'judul'         => $request->judul,
-                'penulis'       => $request->penulis,
-                'penerbit'      => $request->penerbit,
-                'tahun_terbit'  => $request->tahun_terbit,
-                'stok'          => $request->stok,
-                'deskripsi'     => $request->deskripsi,
-                'kategori_id'     => $request->kategori_id
-            ]);
+            // Update tanpa gambar
+            $buku->update($request->except('gambar'));
         }
 
-        //redirect to index
-        return redirect()->route('buku.index')->with(['success' => 'Data Berhasil Diubah!']);
+        return redirect()->route('buku.index')->with('success', 'Data Berhasil Diubah!');
     }
 
-
+    /**
+     * Menghapus data buku
+     */
     public function destroy($id): RedirectResponse
     {
         $buku = Buku::findOrFail($id);
 
-        // CEK hanya yang masih aktif
+        // Cek apakah buku sedang dipinjam
         $dipakai = \App\Models\Peminjaman::where('buku_id', $id)
             ->whereIn('status', ['dipinjam', 'terlambat'])
             ->exists();
 
         if ($dipakai) {
             return redirect()->route('buku.index')
-                ->with('error', 'Buku tidak bisa dihapus karena masih sedang dipinjam!');
+                ->with('error', 'Buku masih dipinjam!');
         }
 
+        // Hapus gambar & data
         Storage::disk('public')->delete('buku/' . $buku->gambar);
         $buku->delete();
 
-        return redirect()->route('buku.index')
-            ->with('success', 'Data Berhasil Dihapus!');
+        return redirect()->route('buku.index')->with('success', 'Data Berhasil Dihapus!');
     }
 
-
+    /**
+     * Menampilkan semua buku (frontend)
+     */
     public function semuaBuku(Request $request)
     {
         $query = Buku::query();
 
+        // Fitur search
         if ($request->has('search')) {
             $query->where('judul', 'like', '%' . $request->search . '%')
                 ->orWhere('penulis', 'like', '%' . $request->search . '%')

@@ -9,20 +9,28 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthAnggotaController extends Controller
 {
-    // ================= LOGIN =================
+    /**
+     * Menampilkan form login anggota
+     */
     public function loginForm()
     {
         return view('frontend.auth.login_anggota');
     }
 
-    // ================= REGISTER =================
+    /**
+     * Menampilkan form register anggota
+     */
     public function registerForm()
     {
         return view('frontend.auth.register_anggota');
     }
 
+    /**
+     * Proses register anggota
+     */
     public function register(Request $request)
     {
+        // Validasi input
         $request->validate([
             'username' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -30,7 +38,7 @@ class AuthAnggotaController extends Controller
             'nama' => 'required',
         ]);
 
-        // simpan ke users
+        // Simpan ke tabel users
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
@@ -38,7 +46,7 @@ class AuthAnggotaController extends Controller
             'role' => 'anggota'
         ]);
 
-        // simpan ke anggota
+        // Simpan ke tabel anggota
         Anggota::create([
             'user_id' => $user->id,
             'nama' => $request->nama,
@@ -47,6 +55,7 @@ class AuthAnggotaController extends Controller
             'alamat' => $request->alamat,
         ]);
 
+        // Redirect ke login
         return redirect()->route('login_anggota')->with('success', 'Register berhasil');
     }
 }

@@ -9,10 +9,13 @@ use Illuminate\Http\Request;
 
 class LaporanController extends Controller
 {
+    /**
+     * Menampilkan semua laporan peminjaman
+     */
     public function index()
     {
         $data = Peminjaman::with(['buku', 'anggota'])
-            ->orderBy('id_peminjaman', 'desc')
+            ->latest('id_peminjaman')
             ->get();
 
         $anggota = Anggota::all();
@@ -21,6 +24,9 @@ class LaporanController extends Controller
         return view('backend.laporan.index', compact('data', 'anggota', 'buku'));
     }
 
+    /**
+     * Menyimpan data laporan
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -40,12 +46,18 @@ class LaporanController extends Controller
         return back()->with('success', 'Data berhasil ditambahkan');
     }
 
+    /**
+     * Detail laporan
+     */
     public function show($id)
     {
         $data = Peminjaman::with(['buku', 'anggota', 'user'])->findOrFail($id);
         return view('backend.laporan.detail', compact('data'));
     }
 
+    /**
+     * Form edit laporan
+     */
     public function edit($id)
     {
         $data = Peminjaman::findOrFail($id);
@@ -55,6 +67,9 @@ class LaporanController extends Controller
         return view('backend.laporan.edit', compact('data', 'anggota', 'buku'));
     }
 
+    /**
+     * Update laporan
+     */
     public function update(Request $request, $id)
     {
         $data = Peminjaman::findOrFail($id);
@@ -70,6 +85,9 @@ class LaporanController extends Controller
         return redirect()->route('laporan.index')->with('success', 'Data berhasil diupdate');
     }
 
+    /**
+     * Hapus laporan
+     */
     public function destroy($id)
     {
         $data = Peminjaman::findOrFail($id);

@@ -11,54 +11,45 @@ use Illuminate\Http\RedirectResponse;
 
 class PetugasController extends Controller
 {
-    // ================= INDEX =================
+    /**
+     * =========================
+     * MENAMPILKAN DATA PETUGAS
+     * =========================
+     */
     public function index(): View
     {
         $data = Petugas::with('user')->get();
         return view('petugas.index', compact('data'));
     }
 
-    // ================= CREATE =================
+    /**
+     * =========================
+     * FORM TAMBAH PETUGAS
+     * =========================
+     */
     public function create(): View
     {
         return view('petugas.create');
     }
 
-    // ================= STORE =================
+    /**
+     * =========================
+     * SIMPAN DATA PETUGAS
+     * =========================
+     */
     public function store(Request $request): RedirectResponse
     {
-
+        // Validasi input
         $request->validate([
             'username' => 'required|min:4|max:20|unique:users,username',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:2',
-
             'nama' => 'required|min:3|max:100',
             'no_telepon' => 'required|min:3|max:15|unique:petugas,no_telepon',
             'alamat' => 'required|min:5'
-        ], [
-            // custom message biar jelas 🔥
-            'username.required' => 'Username wajib diisi!',
-            'username.unique' => 'Username sudah digunakan!',
-            'username.min' => 'Username minimal 4 karakter!',
-
-            'email.required' => 'Email wajib diisi!',
-            'email.email' => 'Format email tidak valid!',
-            'email.unique' => 'Email sudah terdaftar!',
-
-            'password.required' => 'Password wajib diisi!',
-            'password.min' => 'Password minimal 2 karakter!',
-
-            'nama.required' => 'Nama wajib diisi!',
-
-            'no_telepon.required' => 'No telepon wajib diisi!',
-            'no_telepon.numeric' => 'No telepon harus angka!',
-            'no_telepon.unique' => 'No telepon sudah digunakan!',
-            'no_telepon.digits_between' => 'No telepon harus 10-15 digit!',
-
-            'alamat.required' => 'Alamat wajib diisi!'
         ]);
 
+        // Simpan ke tabel user
         $user = User::create([
             'username' => $request->username,
             'email'    => $request->email,
@@ -66,6 +57,7 @@ class PetugasController extends Controller
             'role'     => 'petugas'
         ]);
 
+        // Simpan ke tabel petugas
         Petugas::create([
             'user_id'     => $user->id,
             'nama'        => $request->nama,
@@ -77,49 +69,62 @@ class PetugasController extends Controller
             ->with('success', 'Petugas berhasil dibuat!');
     }
 
-    // ================= SHOW =================
+    /**
+     * =========================
+     * DETAIL PETUGAS
+     * =========================
+     */
     public function show($id): View
     {
         $petugas = Petugas::with('user')->findOrFail($id);
         return view('petugas.show', compact('petugas'));
     }
 
-    // ================= EDIT =================
+    /**
+     * =========================
+     * FORM EDIT PETUGAS
+     * =========================
+     */
     public function edit($id): View
     {
         $petugas = Petugas::with('user')->findOrFail($id);
         return view('petugas.edit', compact('petugas'));
     }
 
-    // ================= UPDATE =================
+    /**
+     * =========================
+     * UPDATE DATA PETUGAS
+     * =========================
+     */
     public function update(Request $request, $id): RedirectResponse
     {
         $petugas = Petugas::findOrFail($id);
         $user = User::findOrFail($petugas->user_id);
 
+        // Validasi input
         $request->validate([
             'username' => 'required',
             'email'    => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:1',
-
             'nama'       => 'required',
             'no_telepon' => 'required',
             'alamat'     => 'required'
         ]);
 
-        // update user
+        // Update user
         $user->update([
             'username' => $request->username,
             'email'    => $request->email,
         ]);
 
+        // Update password jika diisi
         if ($request->password) {
             $user->update([
                 'password' => Hash::make($request->password)
             ]);
         }
 
-        // update petugas
+        // Update petugas
         $petugas->update([
             'nama'       => $request->nama,
             'no_telepon' => $request->no_telepon,
@@ -130,12 +135,17 @@ class PetugasController extends Controller
             ->with('success', 'Data berhasil diupdate!');
     }
 
-    // ================= DELETE =================
+    /**
+     * =========================
+     * HAPUS PETUGAS
+     * =========================
+     */
     public function destroy($id): RedirectResponse
     {
         $petugas = Petugas::findOrFail($id);
         $user = User::findOrFail($petugas->user_id);
 
+        // Hapus data
         $petugas->delete();
         $user->delete();
 

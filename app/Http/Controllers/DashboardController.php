@@ -10,22 +10,25 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    /**
+     * Menampilkan dashboard utama
+     */
     public function index()
     {
         $user = Auth::user();
 
-        // default
+        // Default data
         $labelUser = 'Total Anggota';
         $totalUser = Anggota::count();
 
-        // kalau kepala perpus
+        // Jika kepala perpustakaan
         if ($user->role == 'kepala_perpus') {
             $labelUser = 'Total Petugas';
             $totalUser = Petugas::count();
         }
 
+        // Statistik
         $totalBuku = Buku::count();
-
         $peminjamanAktif = Peminjaman::where('status', 'dipinjam')->count();
         $terlambat = Peminjaman::where('status', 'terlambat')->count();
         $selesai = Peminjaman::where('status', 'dikembalikan')->count();
@@ -33,8 +36,9 @@ class DashboardController extends Controller
         $totalDenda = Peminjaman::sum('denda');
         $totalTransaksi = Peminjaman::count();
 
+        // Data terbaru
         $data = Peminjaman::with(['buku', 'anggota'])
-            ->orderBy('id_peminjaman', 'desc')
+            ->latest('id_peminjaman')
             ->limit(5)
             ->get();
 
