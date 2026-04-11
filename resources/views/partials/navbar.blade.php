@@ -49,11 +49,12 @@
                         <li>
                             <div class="user-box">
                                 <!-- Icon User Large -->
-                                <div class="avatar-lg bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                                <div class="avatar-lg bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                    style="width: 60px; height: 60px;">
                                     <i class="fa fa-user text-white" style="font-size: 30px;"></i>
                                 </div>
                                 <div class="u-text text-center">
-                                    <h4>{{ auth()->user()->username ?? auth()->user()->name }}</h4>
+                                    <h4>{{ auth()->user()->username ?? (auth()->user()->name ?? 'User') }}</h4>
                                     <p class="text-muted">{{ auth()->user()->email ?? '' }}</p>
                                     <p class="badge bg-primary">
                                         {{ auth()->user()->role ?? 'User' }}

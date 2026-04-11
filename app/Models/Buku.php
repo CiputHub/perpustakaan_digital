@@ -22,20 +22,20 @@ class Buku extends Model
         'kategori_id'
     ];
 
-     public $timestamps = false;
+    public $timestamps = false;
 
-     public function peminjaman()
-{
-    return $this->hasMany(Peminjaman::class, 'buku_id', 'id_buku');
-}
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class, 'buku_id', 'id_buku');
+    }
 
-public function kategori()
-{
-    return $this->belongsTo(Kategori::class, 'kategori_id');
-}
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_id');
+    }
 
-public function user(){
-    return $this->belongsTo(User::class);
-}
-
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

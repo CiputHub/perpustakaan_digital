@@ -25,8 +25,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6 order-lg-2 order-1">
-                    <div class="carousel-img text-center">
+               <div class="col-lg-6 order-lg-2 order-1 d-flex justify-content-center align-items-center">
+                    <div class="carousel-img">
                         <img class="img-fluid rounded-4 shadow-lg"
                              src="{{ asset('/storage/buku/'.$row->gambar) }}"
                              alt="{{ $row->judul }}"
@@ -184,7 +184,8 @@
 </div>
 <!-- Kategori Populer End -->
 
-<!-- Call to Action Start -->
+<!-- Call to Action Start (HANYA UNTUK YANG BELUM LOGIN) -->
+@guest('anggota')
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -204,9 +205,50 @@
         </div>
     </div>
 </div>
+@endguest
 <!-- Call to Action End -->
 
+<!-- Untuk User yang Sudah Login, Tampilkan Pesan Selamat Datang -->
+@auth('anggota')
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="bg-success bg-gradient text-white rounded-4 p-5 text-center shadow-lg">
+                <i class="fas fa-smile-wink fa-3x mb-3 opacity-75"></i>
+                <h2 class="fw-bold mb-3">Selamat Datang Kembali, {{ auth()->guard('anggota')->user()->nama ?? auth()->guard('anggota')->user()->name ?? 'Anggota' }}! 👋</h2>
+                <p class="mb-4 opacity-75">Nikmati kemudahan meminjam buku secara online. Temukan buku favorit Anda sekarang!</p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{{ route('semua.buku') }}" class="btn btn-light text-success px-4 py-2 rounded-pill fw-bold">
+                        <i class="fas fa-book me-2"></i>Lihat Koleksi Buku
+                    </a>
+                    <a href="{{ route('history') }}" class="btn btn-outline-light px-4 py-2 rounded-pill">
+                        <i class="fas fa-history me-2"></i>History Peminjaman
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endauth
+
 <style>
+
+    .carousel-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel-img img {
+    max-height: 420px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.carousel-img img:hover {
+    transform: scale(1.05);
+}
     /* Hover Effects */
     .hover-card {
         transition: all 0.3s ease;
@@ -296,13 +338,34 @@
     html {
         scroll-behavior: smooth;
     }
+
+    /* Animasi fade in untuk card */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card {
+        animation: fadeInUp 0.5s ease backwards;
+    }
 </style>
 
 <script>
     function pinjamBuku(id) {
-        if(confirm('Apakah Anda ingin meminjam buku ini?')) {
-            window.location.href = "{{ url('pinjam') }}/" + id;
-        }
+        @auth('anggota')
+            if(confirm('Apakah Anda ingin meminjam buku ini?')) {
+                window.location.href = "{{ url('pinjam') }}/" + id;
+            }
+        @else
+            alert('⚠️ Anda harus login dulu sebagai anggota!');
+            window.location.href = "{{ route('login_anggota') }}";
+        @endauth
     }
 </script>
 

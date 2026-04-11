@@ -17,9 +17,9 @@ class AuthAnggotaController extends Controller
 
     // ================= REGISTER =================
     public function registerForm()
-{
-    return view('frontend.auth.register_anggota');
-}
+    {
+        return view('frontend.auth.register_anggota');
+    }
 
     public function register(Request $request)
     {
@@ -49,5 +49,4 @@ class AuthAnggotaController extends Controller
 
         return redirect()->route('login_anggota')->with('success', 'Register berhasil');
     }
-
 }

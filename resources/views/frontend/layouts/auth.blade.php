@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Auth</title>
@@ -14,6 +15,7 @@
             background: linear-gradient(135deg, #4e73df, #1cc88a);
             min-height: 100vh;
         }
+
         .auth-card {
             border-radius: 15px;
         }
@@ -22,11 +24,12 @@
 
 <body>
 
-<div class="container d-flex justify-content-center align-items-center" style="min-height:100vh;">
-    <div class="col-md-5">
-        @yield('content')
+    <div class="container d-flex justify-content-center align-items-center" style="min-height:100vh;">
+        <div class="col-md-5">
+            @yield('content')
+        </div>
     </div>
-</div>
 
 </body>
+
 </html>

@@ -20,8 +20,8 @@
     <!-- Search & Filter Section -->
     <div class="card border-0 shadow-sm rounded-4 mb-5">
         <div class="card-body p-4">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-8">
+            <div class="row g-3">
+                <div class="col-md-5">
                     <label class="form-label fw-semibold mb-2">
                         <i class="fas fa-search text-primary me-1"></i> Cari Buku
                     </label>
@@ -30,9 +30,19 @@
                            class="form-control form-control-lg rounded-pill"
                            placeholder="Cari berdasarkan judul, penulis, atau penerbit..."
                            autocomplete="off">
-                    <small class="text-muted mt-2 d-block" id="searchInfo"></small>
                 </div>
                 <div class="col-md-4">
+                    <label class="form-label fw-semibold mb-2">
+                        <i class="fas fa-tag text-primary me-1"></i> Kategori
+                    </label>
+                    <select id="filterKategori" class="form-select rounded-pill">
+                        <option value="all">Semua Kategori</option>
+                        @foreach($kategoris as $kat)
+                        <option value="{{ strtolower($kat->nama_kategori) }}">{{ $kat->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <label class="form-label fw-semibold mb-2">
                         <i class="fas fa-filter text-primary me-1"></i> Filter Stok
                     </label>
@@ -43,6 +53,7 @@
                     </select>
                 </div>
             </div>
+            <small class="text-muted mt-3 d-block" id="searchInfo"></small>
         </div>
     </div>
 
@@ -65,24 +76,25 @@
              data-judul="{{ strtolower($item->judul) }}"
              data-penulis="{{ strtolower($item->penulis ?? '') }}"
              data-penerbit="{{ strtolower($item->penerbit ?? '') }}"
+             data-kategori="{{ strtolower($item->kategori->nama_kategori ?? '') }}"
              data-stok="{{ $item->stok }}">
             <div class="card h-100 border-0 shadow-sm rounded-4 hover-card">
-                <!-- Gambar dengan Badge -->
-                <div class="position-relative overflow-hidden rounded-top-4">
+                <!-- Gambar dengan Badge (TIDAK KEPOTONG) -->
+                <div class="position-relative overflow-hidden rounded-top-4 bg-light" style="height: 260px;">
                     <a href="{{ route('detail', $item->id_buku) }}">
                         <img src="{{ asset('/storage/buku/'.$item->gambar) }}"
                              class="card-img-top"
                              alt="{{ $item->judul }}"
-                             style="height: 260px; width: 100%; object-fit: cover; transition: transform 0.3s;">
+                             style="height: 100%; width: 100%; object-fit: contain; padding: 1rem; transition: transform 0.3s;">
                     </a>
 
                     <!-- Badge Stok -->
                     @if($item->stok > 0)
-                    <span class="position-absolute top-0 end-0 m-3 badge bg-success rounded-pill px-3 py-2 shadow-sm">
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-success rounded-pill px-3 py-2 shadow-sm">
                         <i class="fas fa-check-circle me-1"></i> Tersedia
                     </span>
                     @else
-                    <span class="position-absolute top-0 end-0 m-3 badge bg-danger rounded-pill px-3 py-2 shadow-sm">
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-danger rounded-pill px-3 py-2 shadow-sm">
                         <i class="fas fa-times-circle me-1"></i> Habis
                     </span>
                     @endif
@@ -95,6 +107,15 @@
                             {{ Str::limit($item->judul, 50) }}
                         </a>
                     </h6>
+
+                    <!-- Kategori Badge -->
+                    @if($item->kategori)
+                    <div class="mb-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1">
+                            <i class="fas fa-tag me-1"></i> {{ $item->kategori->nama_kategori }}
+                        </span>
+                    </div>
+                    @endif
 
                     <div class="mb-3">
                         <p class="mb-1 small text-muted">
@@ -115,11 +136,12 @@
                         </p>
                     </div>
 
-                    <!-- Button Pinjam -->
+                    <!-- Button Pinjam (WARNA KUNING) -->
                     <div class="mt-auto">
-                        <button class="btn {{ $item->stok > 0 ? 'btn-primary' : 'btn-secondary' }} w-100 rounded-pill py-2"
+                        <button class="btn btn-warning w-100 rounded-pill py-2 fw-semibold"
                                 onclick="pinjamBuku({{ $item->id_buku }})"
-                                {{ $item->stok < 1 ? 'disabled' : '' }}>
+                                {{ $item->stok < 1 ? 'disabled' : '' }}
+                                style="background: #ffc107; border: none; color: #1e293b;">
                             <i class="fas fa-cart-plus me-2"></i>
                             {{ $item->stok > 0 ? 'Pinjam Sekarang' : 'Stok Habis' }}
                         </button>
@@ -136,7 +158,7 @@
             <div class="card-body py-5">
                 <i class="fas fa-search fa-4x text-muted mb-3 d-block"></i>
                 <h5 class="text-muted">Buku tidak ditemukan</h5>
-                <p class="text-muted small">Coba cari dengan kata kunci yang berbeda</p>
+                <p class="text-muted small">Coba cari dengan kata kunci atau kategori yang berbeda</p>
                 <button class="btn btn-primary rounded-pill px-4" onclick="resetSearch()">
                     <i class="fas fa-redo me-2"></i>Reset Pencarian
                 </button>
@@ -182,7 +204,7 @@
     }
 
     /* Search Input Styling */
-    #searchInput:focus, #filterStok:focus {
+    #searchInput:focus, #filterStok:focus, #filterKategori:focus {
         box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
         border-color: #0d6efd;
     }
@@ -202,13 +224,27 @@
             transform: translateY(0);
         }
     }
+
+    /* Tombol warning hover effect */
+    .btn-warning:hover {
+        background: #e0a800 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+    }
+
+    .btn-warning:disabled {
+        background: #e9ecef !important;
+        cursor: not-allowed;
+        transform: none;
+    }
 </style>
 
 <script>
-    // Fungsi Search & Filter
+    // Fungsi Search & Filter (termasuk kategori)
     function filterBuku() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const filterStok = document.getElementById('filterStok').value;
+        const filterKategori = document.getElementById('filterKategori').value.toLowerCase();
         const bukuItems = document.querySelectorAll('.buku-item');
         let visibleCount = 0;
 
@@ -216,6 +252,7 @@
             const judul = item.dataset.judul || '';
             const penulis = item.dataset.penulis || '';
             const penerbit = item.dataset.penerbit || '';
+            const kategori = item.dataset.kategori || '';
             const stok = parseInt(item.dataset.stok);
 
             // Cek pencarian
@@ -223,6 +260,9 @@
                                  judul.includes(searchTerm) ||
                                  penulis.includes(searchTerm) ||
                                  penerbit.includes(searchTerm);
+
+            // Cek filter kategori
+            const matchesKategori = filterKategori === 'all' || kategori === filterKategori;
 
             // Cek filter stok
             let matchesStok = true;
@@ -233,7 +273,7 @@
             }
 
             // Tampilkan atau sembunyikan
-            if (matchesSearch && matchesStok) {
+            if (matchesSearch && matchesKategori && matchesStok) {
                 item.style.display = '';
                 visibleCount++;
                 // Tambah animasi sedikit
@@ -263,10 +303,16 @@
 
         // Update search info
         const searchInfo = document.getElementById('searchInfo');
-        if (searchTerm && visibleCount > 0) {
-            searchInfo.innerHTML = `<i class="fas fa-check-circle text-success"></i> Menampilkan ${visibleCount} hasil untuk "${searchTerm}"`;
-        } else if (searchTerm && visibleCount === 0) {
-            searchInfo.innerHTML = `<i class="fas fa-times-circle text-danger"></i> Tidak ada hasil untuk "${searchTerm}"`;
+        if ((searchTerm || filterKategori !== 'all') && visibleCount > 0) {
+            let infoText = '';
+            if (searchTerm) infoText += `"${searchTerm}" `;
+            if (filterKategori !== 'all') infoText += `di kategori ${filterKategori} `;
+            searchInfo.innerHTML = `<i class="fas fa-check-circle text-success"></i> Menampilkan ${visibleCount} hasil untuk ${infoText}`;
+        } else if ((searchTerm || filterKategori !== 'all') && visibleCount === 0) {
+            let infoText = '';
+            if (searchTerm) infoText += `"${searchTerm}" `;
+            if (filterKategori !== 'all') infoText += `di kategori ${filterKategori} `;
+            searchInfo.innerHTML = `<i class="fas fa-times-circle text-danger"></i> Tidak ada hasil untuk ${infoText}`;
         } else {
             searchInfo.innerHTML = '';
         }
@@ -276,6 +322,7 @@
     function resetSearch() {
         document.getElementById('searchInput').value = '';
         document.getElementById('filterStok').value = 'all';
+        document.getElementById('filterKategori').value = 'all';
         filterBuku();
     }
 
@@ -290,12 +337,16 @@
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('searchInput');
         const filterStok = document.getElementById('filterStok');
+        const filterKategori = document.getElementById('filterKategori');
 
         if (searchInput) {
             searchInput.addEventListener('keyup', filterBuku);
         }
         if (filterStok) {
             filterStok.addEventListener('change', filterBuku);
+        }
+        if (filterKategori) {
+            filterKategori.addEventListener('change', filterBuku);
         }
 
         // Debounce untuk search

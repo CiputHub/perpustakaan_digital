@@ -13,193 +13,194 @@ class PeminjamanController extends Controller
 {
 
     public function index()
-{
-    $data = Peminjaman::with(['buku', 'anggota'])
-        ->orderBy('id_peminjaman', 'desc')
-        ->get();
+    {
+        $data = Peminjaman::with(['buku', 'anggota'])
+            ->orderBy('id_peminjaman', 'desc')
+            ->get();
 
-    return view('peminjaman.index', compact('data'));
-
+        return view('peminjaman.index', compact('data'));
     }
 
 
     public function acc($id)
-{
-    $data = Peminjaman::findOrFail($id);
+    {
+        $data = Peminjaman::findOrFail($id);
 
-    // ubah status jadi dipinjam
-    $data->status = 'dipinjam';
-    $data->save();
+        // ubah status jadi dipinjam
+        $data->status = 'dipinjam';
+        $data->save();
 
-    // kurangi stok buku
-    $buku = Buku::find($data->buku_id);
-    $buku->stok -= 1;
-    $buku->save();
+        // kurangi stok buku
+        $buku = Buku::find($data->buku_id);
+        $buku->stok -= 1;
+        $buku->save();
 
-    return back()->with('success', 'Peminjaman disetujui');
-}
+        return back()->with('success', 'Peminjaman disetujui');
+    }
 
     public function create($id)
-{
-    $buku = Buku::findOrFail($id);
+    {
+        if (!Auth::guard('anggota')->check()) {
+            return redirect()->route('login_anggota')
+                ->with('error', 'Silahkan login dulu sebelum meminjam!');
+        }
 
-    $user = Auth::guard('anggota')->user();
+        $buku = Buku::findOrFail($id);
 
-$anggota = Anggota::where('user_id', $user->id)->first();
+        $user = Auth::guard('anggota')->user();
+        $anggota = Anggota::where('user_id', $user->id)->first();
 
-    if (!$anggota) {
-        return redirect()->route('login_anggota')
-            ->with('error', 'Silahkan login dulu');
+        if (!$anggota) {
+            return redirect()->route('login_anggota')
+                ->with('error', 'Data anggota tidak ditemukan');
+        }
+
+        return view('frontend.peminjaman.form', compact('buku', 'anggota'));
     }
 
-    return view('frontend.peminjaman.form', compact('buku', 'anggota'));
-}
+    public function store(Request $request)
+    {
+        $request->validate([
+            'buku_id' => 'required',
+            'tanggal_pinjam' => 'required|date|after_or_equal:today',
+            'tanggal_pengembalian' => 'required|date|after_or_equal:today|before_or_equal:' . now()->addDays(7)->format('Y-m-d'),
+        ]);
 
-public function store(Request $request)
-{
-    $request->validate([
-    'buku_id' => 'required',
-    'tanggal_pinjam' => 'required|date|after_or_equal:today',
-    'tanggal_pengembalian' => 'required|date|after_or_equal:today|before_or_equal:' . now()->addDays(7)->format('Y-m-d'),
-]);
+        $buku = Buku::findOrFail($request->buku_id);
 
-    $buku = Buku::findOrFail($request->buku_id);
+        if ($buku->stok <= 0) {
+            return back()->with('error', 'Stok habis!');
+        }
 
-    if ($buku->stok <= 0) {
-        return back()->with('error', 'Stok habis!');
+        $user = Auth::guard('anggota')->user();
+
+        $anggota = Anggota::where('user_id', $user->id)->first();
+
+        if (!$anggota) {
+            return redirect()->route('login_anggota');
+        }
+
+        // batas max 3 buku
+        $jumlahPinjam = Peminjaman::where('anggota_id', $anggota->id_anggota)
+            ->whereIn('status', ['menunggu', 'dipinjam'])
+            ->count();
+
+        if ($jumlahPinjam >= 3) {
+            return back()->with('error', 'Maksimal peminjaman 3 buku!');
+        }
+
+        $user = Auth::guard('anggota')->user();
+
+        Peminjaman::create([
+            'buku_id' => $buku->id_buku,
+            'anggota_id' => $anggota->id_anggota,
+            'user_id' => $user->id, // ✅ FIX DI SINI
+            'tanggal_pinjam' => now(),
+            'tanggal_pengembalian' => $request->tanggal_pengembalian,
+            'status' => 'menunggu'
+        ]);
+
+        return redirect('/')->with('success', 'Menunggu konfirmasi petugas');
     }
 
-    $user = Auth::guard('anggota')->user();
 
-    $anggota = Anggota::where('user_id', $user->id)->first();
+    public function history()
+    {
+        $user = Auth::guard('anggota')->user();
 
-    if (!$anggota) {
-        return redirect()->route('login_anggota');
-    }
+        if (!$user) {
+            return redirect()->route('login_anggota')
+                ->with('error', 'Silahkan login dulu');
+        }
 
-    // batas max 3 buku
-    $jumlahPinjam = Peminjaman::where('anggota_id', $anggota->id_anggota)
-        ->whereIn('status', ['menunggu', 'dipinjam'])
-        ->count();
+        $anggota = Anggota::where('user_id', $user->id)->first();
 
-    if ($jumlahPinjam >= 3) {
-        return back()->with('error', 'Maksimal peminjaman 3 buku!');
-    }
+        if (!$anggota) {
+            return back()->with('error', 'Data anggota tidak ditemukan');
+        }
 
-   $user = Auth::guard('anggota')->user();
+        $data = Peminjaman::with('buku')
+            ->where('anggota_id', $anggota->id_anggota)
+            ->orderBy('id_peminjaman', 'desc')
+            ->get();
 
-Peminjaman::create([
-    'buku_id' => $buku->id_buku,
-    'anggota_id' => $anggota->id_anggota,
-    'user_id' => $user->id, // ✅ FIX DI SINI
-    'tanggal_pinjam' => now(),
-    'tanggal_pengembalian' => $request->tanggal_pengembalian,
-    'status' => 'menunggu'
-]);
-
-    return redirect('/')->with('success', 'Menunggu konfirmasi petugas');
-}
-
-
-public function history()
-{
-    $user = Auth::guard('anggota')->user();
-
-    if (!$user) {
-        return redirect()->route('login_anggota')
-            ->with('error', 'Silahkan login dulu');
-    }
-
-    $anggota = Anggota::where('user_id', $user->id)->first();
-
-    if (!$anggota) {
-        return back()->with('error', 'Data anggota tidak ditemukan');
-    }
-
-    $data = Peminjaman::with('buku')
-        ->where('anggota_id', $anggota->id_anggota)
-        ->orderBy('id_peminjaman', 'desc')
-        ->get();
-
-    foreach ($data as $row) {
-        if ($row->status == 'dipinjam') {
-            if (now()->gt(\Carbon\Carbon::parse($row->tanggal_pengembalian))) {
-                $row->status = 'terlambat';
+        foreach ($data as $row) {
+            if ($row->status == 'dipinjam') {
+                if (now()->gt(\Carbon\Carbon::parse($row->tanggal_pengembalian))) {
+                    $row->status = 'terlambat';
+                }
             }
         }
+
+        return view('frontend.history.index', compact('data'));
     }
 
-    return view('frontend.history.index', compact('data'));
-}
+    public function kembalikan($id)
+    {
+        try {
+            $pinjam = Peminjaman::findOrFail($id);
 
-public function kembalikan($id)
-{
-    try {
-        $pinjam = Peminjaman::findOrFail($id);
+            $today = now();
+            if (!$pinjam->tanggal_pengembalian) {
+                return back()->with('error', 'Tanggal pengembalian tidak valid');
+            }
 
-        $today = now();
-        if (!$pinjam->tanggal_pengembalian) {
-    return back()->with('error', 'Tanggal pengembalian tidak valid');
-}
+            $today = now()->startOfDay();
+            $tglKembali = \Carbon\Carbon::parse($pinjam->tanggal_pengembalian)->startOfDay();
 
-$today = now()->startOfDay();
-$tglKembali = \Carbon\Carbon::parse($pinjam->tanggal_pengembalian)->startOfDay();
+            $hariTelat = 0;
+            $denda = 0;
 
-$hariTelat = 0;
-$denda = 0;
+            if ($today->gt($tglKembali)) {
+                $hariTelat = $tglKembali->diffInDays($today);
+                $denda = $hariTelat * 2000;
+            }
 
-if ($today->gt($tglKembali)) {
-    $hariTelat = $tglKembali->diffInDays($today);
-    $denda = $hariTelat * 2000;
-}
+            // 🔥 STATUS SELALU DIKEMBALIKAN
+            $pinjam->status = 'dikembalikan';
 
-        // 🔥 STATUS SELALU DIKEMBALIKAN
-        $pinjam->status = 'dikembalikan';
+            $pinjam->denda = $denda;
+            $pinjam->save();
 
-        $pinjam->denda = $denda;
-        $pinjam->save();
+            // 🔥 FIX DI SINI
+            $buku = Buku::find($pinjam->buku_id);
+            if ($buku) {
+                $buku->increment('stok');
+            }
 
-        // 🔥 FIX DI SINI
-        $buku = Buku::find($pinjam->buku_id);
-        if ($buku) {
-            $buku->increment('stok');
+            return redirect()->route('history')->with('success', 'Buku berhasil dikembalikan');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    public function formKembali($id)
+    {
+        $pinjam = Peminjaman::with('buku', 'anggota')->findOrFail($id);
+
+        $today = now()->startOfDay();
+        $tglKembali = Carbon::parse($pinjam->tanggal_pengembalian)->startOfDay();
+
+        $hariTelat = 0;
+        $denda = 0;
+
+        if ($today->gt($tglKembali)) {
+            $hariTelat = $tglKembali->diffInDays($today);
+            $denda = $hariTelat * 2000;
         }
 
-        return redirect()->route('history')->with('success', 'Buku berhasil dikembalikan');
-
-    } catch (\Exception $e) {
-        return back()->with('error', 'Error: ' . $e->getMessage());
-    }
-}
-
-public function formKembali($id)
-{
-    $pinjam = Peminjaman::with('buku', 'anggota')->findOrFail($id);
-
-    $today = now()->startOfDay();
-    $tglKembali = Carbon::parse($pinjam->tanggal_pengembalian)->startOfDay();
-
-    $hariTelat = 0;
-    $denda = 0;
-
-    if ($today->gt($tglKembali)) {
-        $hariTelat = $tglKembali->diffInDays($today);
-        $denda = $hariTelat * 2000;
+        return view('frontend.pengembalian.index', compact('pinjam', 'denda', 'hariTelat'));
     }
 
-    return view('frontend.pengembalian.index', compact('pinjam', 'denda', 'hariTelat'));
-}
 
+    //LAPORAN PEMINJAMAN
 
-//LAPORAN PEMINJAMAN
+    public function laporan()
+    {
+        $data = Peminjaman::with(['buku', 'anggota'])
+            ->orderBy('id_peminjaman', 'desc')
+            ->get();
 
-public function laporan()
-{
-    $data = Peminjaman::with(['buku', 'anggota'])
-        ->orderBy('id_peminjaman', 'desc')
-        ->get();
-
-    return view('backend.laporan.index', compact('data'));
-}
-
+        return view('backend.laporan.index', compact('data'));
+    }
 }

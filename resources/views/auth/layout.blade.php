@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Login - Perpustakaan</title>
@@ -10,9 +10,10 @@
 
 <body style="background: #f5f7fb;">
 
-<div class="container d-flex align-items-center justify-content-center" style="height:100vh;">
-    @yield('content')
-</div>
+    <div class="container d-flex align-items-center justify-content-center" style="height:100vh;">
+        @yield('content')
+    </div>
 
 </body>
+
 </html>

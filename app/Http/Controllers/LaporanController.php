@@ -11,14 +11,14 @@ class LaporanController extends Controller
 {
     public function index()
     {
-        $data = Peminjaman::with(['buku','anggota'])
-            ->orderBy('id_peminjaman','desc')
+        $data = Peminjaman::with(['buku', 'anggota'])
+            ->orderBy('id_peminjaman', 'desc')
             ->get();
 
         $anggota = Anggota::all();
         $buku = Buku::all();
 
-        return view('backend.laporan.index', compact('data','anggota','buku'));
+        return view('backend.laporan.index', compact('data', 'anggota', 'buku'));
     }
 
     public function store(Request $request)
@@ -37,12 +37,12 @@ class LaporanController extends Controller
             'status' => 'dipinjam'
         ]);
 
-        return back()->with('success','Data berhasil ditambahkan');
+        return back()->with('success', 'Data berhasil ditambahkan');
     }
 
     public function show($id)
     {
-        $data = Peminjaman::with(['buku','anggota','user'])->findOrFail($id);
+        $data = Peminjaman::with(['buku', 'anggota', 'user'])->findOrFail($id);
         return view('backend.laporan.detail', compact('data'));
     }
 
@@ -52,7 +52,7 @@ class LaporanController extends Controller
         $anggota = Anggota::all();
         $buku = Buku::all();
 
-        return view('backend.laporan.edit', compact('data','anggota','buku'));
+        return view('backend.laporan.edit', compact('data', 'anggota', 'buku'));
     }
 
     public function update(Request $request, $id)
@@ -67,7 +67,7 @@ class LaporanController extends Controller
             'status' => $request->status
         ]);
 
-        return redirect()->route('laporan.index')->with('success','Data berhasil diupdate');
+        return redirect()->route('laporan.index')->with('success', 'Data berhasil diupdate');
     }
 
     public function destroy($id)
@@ -75,6 +75,6 @@ class LaporanController extends Controller
         $data = Peminjaman::findOrFail($id);
         $data->delete();
 
-        return back()->with('success','Data berhasil dihapus');
+        return back()->with('success', 'Data berhasil dihapus');
     }
 }

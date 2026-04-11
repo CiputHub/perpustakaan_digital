@@ -18,11 +18,11 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-    'username',
-    'email',
-    'password',
-    'role'
-];
+        'username',
+        'email',
+        'password',
+        'role'
+    ];
 
     public function anggota()
     {

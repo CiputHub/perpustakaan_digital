@@ -18,62 +18,62 @@ class AuthController extends Controller
     }
 
     // PROSES LOGIN
-   public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required'
-    ]);
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
 
-    // 🔥 MATIIN SESSION ANGGOTA
-    Session::flush();
+        // 🔥 MATIIN SESSION ANGGOTA
+        Session::flush();
 
-    if (Auth::attempt($request->only('email','password'))) {
-        return redirect()->route('dashboard');
+        if (Auth::attempt($request->only('email', 'password'))) {
+            return redirect()->route('dashboard');
+        }
+
+        return back()->with('error', 'Email atau password salah!');
     }
 
-    return back()->with('error','Email atau password salah!');
-}
-
     public function registerForm()
-{
-    return view('auth.register');
-}
+    {
+        return view('auth.register');
+    }
 
     // FORM REGISTER
     public function register(Request $request)
-{
-    $request->validate([
-        'username' => 'required',
-        'email'    => 'required|email|unique:users,email',
-        'password' => 'required|min:1',
+    {
+        $request->validate([
+            'username' => 'required',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:1',
 
-        'nama'     => 'required',
-        'alamat'   => 'required',
-        'no_telp'  => 'required'
-    ]);
+            'nama'     => 'required',
+            'alamat'   => 'required',
+            'no_telp'  => 'required'
+        ]);
 
-    // 1. SIMPAN USER
-    $user = User::create([
-        'username' => $request->username,
-        'email'    => $request->email,
-        'password' => Hash::make($request->password),
-        'role'     => 'kepala_perpus'
-    ]);
+        // 1. SIMPAN USER
+        $user = User::create([
+            'username' => $request->username,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => 'kepala_perpus'
+        ]);
 
-    // 2. SIMPAN KE KEPALA PERPUS
-    KepalaPerpus::create([
-        'user_id' => $user->id,
-        'nama'    => $request->nama,
-        'alamat'  => $request->alamat,
-        'no_telepon'  => $request->no_telp
-    ]);
+        // 2. SIMPAN KE KEPALA PERPUS
+        KepalaPerpus::create([
+            'user_id' => $user->id,
+            'nama'    => $request->nama,
+            'alamat'  => $request->alamat,
+            'no_telepon'  => $request->no_telp
+        ]);
 
-    return redirect()->route('login')->with('success', 'Akun berhasil dibuat!');
-}
+        return redirect()->route('login')->with('success', 'Akun berhasil dibuat!');
+    }
 
     // LOGOUT
-   public function logout()
+    public function logout()
     {
         Auth::logout();
         return redirect()->route('login');

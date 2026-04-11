@@ -11,7 +11,7 @@ use Illuminate\Http\RedirectResponse;
 
 class BukuController extends Controller
 {
-   public function index()
+    public function index()
     {
         $buku = Buku::all();
         $kategori = Kategori::all();
@@ -19,23 +19,23 @@ class BukuController extends Controller
         return view('buku.index', compact('buku', 'kategori'));
     }
 
-        public function create(): View
-        {
-            $kategori = Kategori::all();
-            return view('buku.create', compact('kategori'));
-        }
+    public function create(): View
+    {
+        $kategori = Kategori::all();
+        return view('buku.create', compact('kategori'));
+    }
 
-     public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'judul'         => 'required|min:3',
             'gambar'        => 'required|image|mimes:jpeg,jpg,png|max:2048',
             'penulis'       => 'required|min:5',
             'penerbit'      => 'required|min:3',
-            'tahun_terbit'  =>'required|date',
-            'stok'          =>'required|min:1',
-            'deskripsi'     =>'required|min:1',
-            'kategori_id'     =>'required'
+            'tahun_terbit'  => 'required|date',
+            'stok'          => 'required|min:0',
+            'deskripsi'     => 'required|min:1',
+            'kategori_id'     => 'required'
 
         ]);
 
@@ -57,34 +57,34 @@ class BukuController extends Controller
         return redirect()->route('buku.index')->with(['success' => 'Data Berhasil Disimpan!']);
     }
 
-public function show(string $id): View
-{
-    $buku = Buku::findOrFail($id);
-    return view("buku.show", compact('buku'));
-}
+    public function show(string $id): View
+    {
+        $buku = Buku::findOrFail($id);
+        return view("buku.show", compact('buku'));
+    }
 
     public function edit(string $id): View
     {
         $buku = Buku::findOrFail($id);
         $kategori = Kategori::all(); // 🔥 ambil semua kategori
 
-    return view("buku.edit", compact('buku', 'kategori'));
+        return view("buku.edit", compact('buku', 'kategori'));
     }
 
-   public function update(Request $request, $id): RedirectResponse
-{
-    $request->validate([
-        'judul'        => 'required|min:3',
-        'gambar'       => 'image|mimes:jpeg,jpg,png|max:2048',
-        'penulis'      => 'required|min:3',
-        'penerbit'     => 'required|min:3',
-        'tahun_terbit' => 'required|date',
-        'stok'         => 'required|integer|min:1',
-        'deskripsi'    => 'required|min:1',
-        'kategori_id'    => 'required'
-    ]);
+    public function update(Request $request, $id): RedirectResponse
+    {
+        $request->validate([
+            'judul'        => 'required|min:3',
+            'gambar'       => 'image|mimes:jpeg,jpg,png|max:2048',
+            'penulis'      => 'required|min:3',
+            'penerbit'     => 'required|min:3',
+            'tahun_terbit' => 'required|date',
+            'stok'         => 'required|integer|min:0',
+            'deskripsi'    => 'required|min:1',
+            'kategori_id'    => 'required'
+        ]);
 
-    //get product by ID
+        //get product by ID
         $buku = Buku::findOrFail($id);
 
         //check if image is uploaded
@@ -129,40 +129,39 @@ public function show(string $id): View
 
 
     public function destroy($id): RedirectResponse
-{
-    $buku = Buku::findOrFail($id);
+    {
+        $buku = Buku::findOrFail($id);
 
-    // CEK hanya yang masih aktif
-    $dipakai = \App\Models\Peminjaman::where('buku_id', $id)
-        ->whereIn('status', ['dipinjam', 'terlambat'])
-        ->exists();
+        // CEK hanya yang masih aktif
+        $dipakai = \App\Models\Peminjaman::where('buku_id', $id)
+            ->whereIn('status', ['dipinjam', 'terlambat'])
+            ->exists();
 
-    if ($dipakai) {
+        if ($dipakai) {
+            return redirect()->route('buku.index')
+                ->with('error', 'Buku tidak bisa dihapus karena masih sedang dipinjam!');
+        }
+
+        Storage::disk('public')->delete('buku/' . $buku->gambar);
+        $buku->delete();
+
         return redirect()->route('buku.index')
-            ->with('error', 'Buku tidak bisa dihapus karena masih sedang dipinjam!');
+            ->with('success', 'Data Berhasil Dihapus!');
     }
 
-    Storage::disk('public')->delete('buku/' . $buku->gambar);
-    $buku->delete();
 
-    return redirect()->route('buku.index')
-        ->with('success', 'Data Berhasil Dihapus!');
-}
+    public function semuaBuku(Request $request)
+    {
+        $query = Buku::query();
 
+        if ($request->has('search')) {
+            $query->where('judul', 'like', '%' . $request->search . '%')
+                ->orWhere('penulis', 'like', '%' . $request->search . '%')
+                ->orWhere('penerbit', 'like', '%' . $request->search . '%');
+        }
 
-public function semuaBuku(Request $request)
-{
-    $query = Buku::query();
+        $buku = $query->paginate(12);
 
-    if ($request->has('search')) {
-        $query->where('judul', 'like', '%'.$request->search.'%')
-              ->orWhere('penulis', 'like', '%'.$request->search.'%')
-              ->orWhere('penerbit', 'like', '%'.$request->search.'%');
+        return view('frontend.semua-buku', compact('buku'));
     }
-
-    $buku = $query->paginate(12);
-
-    return view('frontend.semua-buku', compact('buku'));
-}
-
 }

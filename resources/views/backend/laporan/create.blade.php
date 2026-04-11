@@ -14,8 +14,9 @@
                         <label class="form-label">Pilih Anggota</label>
                         <select name="id_anggota" class="form-select" required>
                             <option value="">-- Pilih Anggota --</option>
-                            @foreach($data as $i => $row)
-                            <option value="{{ $row->id_anggota }}">{{ $row->nama }} ({{ $row->nomor_induk ?? $row->nis }})</option>
+                            @foreach ($data as $i => $row)
+                                <option value="{{ $row->id_anggota }}">{{ $row->nama }}
+                                    ({{ $row->nomor_induk ?? $row->nis }})</option>
                             @endforeach
                         </select>
                     </div>
@@ -23,14 +24,16 @@
                         <label class="form-label">Pilih Buku</label>
                         <select name="id_buku" class="form-select" required>
                             <option value="">-- Pilih Buku --</option>
-                            @foreach($data as $i => $row)
-                            <option value="{{ $row->id_buku }}">{{ $row->buku->judul }} (Stok: {{ $row->buku->stok }})</option>
+                            @foreach ($data as $i => $row)
+                                <option value="{{ $row->id_buku }}">{{ $row->buku->judul }} (Stok:
+                                    {{ $row->buku->stok }})</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Tanggal Pinjam</label>
-                        <input type="date" name="tanggal_pinjam" class="form-control" value="{{ date('Y-m-d') }}" required>
+                        <input type="date" name="tanggal_pinjam" class="form-control" value="{{ date('Y-m-d') }}"
+                            required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Tanggal Kembali (Opsional)</label>
@@ -38,7 +41,8 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-4">Simpan</button>
                 </div>
             </form>

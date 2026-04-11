@@ -6,16 +6,16 @@ use App\Models\Anggota;
 
 class AnggotaController extends Controller
 {
-    public function index(){
+    public function index()
+    {
 
-    $data = Anggota::all();
+        $data = Anggota::all();
         return view('anggota.index', compact('data'));
     }
 
     public function show($id)
-{
-    $anggota = Anggota::with('user')->findOrFail($id);
-    return view('anggota.show', compact('anggota'));
-
-}
+    {
+        $anggota = Anggota::with('user')->findOrFail($id);
+        return view('anggota.show', compact('anggota'));
+    }
 }

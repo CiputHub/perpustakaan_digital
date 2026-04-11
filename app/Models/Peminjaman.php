@@ -21,18 +21,17 @@ class Peminjaman extends Model
     ];
 
     public function buku()
-{
-    return $this->belongsTo(Buku::class, 'buku_id', 'id_buku');
-}
+    {
+        return $this->belongsTo(Buku::class, 'buku_id', 'id_buku');
+    }
 
-public function anggota()
-{
-    return $this->belongsTo(Anggota::class, 'anggota_id', 'id_anggota');
-}
+    public function anggota()
+    {
+        return $this->belongsTo(Anggota::class, 'anggota_id', 'id_anggota');
+    }
 
-public function user()
-{
-    return $this->belongsTo(\App\Models\User::class, 'user_id');
-}
-
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
 }

@@ -14,8 +14,8 @@ class FrontendController extends Controller
     {
         // Buku terbaru
         $buku = Buku::with('kategori')
-                    ->orderBy('id_buku', 'desc')
-                    ->get();
+            ->orderBy('id_buku', 'desc')
+            ->get();
 
         // Kategori + jumlah buku
         $kategoris = Kategori::withCount('buku')->get();
@@ -42,23 +42,24 @@ class FrontendController extends Controller
         $kategori = Kategori::findOrFail($id);
 
         $buku = Buku::with('kategori')
-                    ->where('kategori_id', $id)
-                    ->paginate(12);
+            ->where('kategori_id', $id)
+            ->paginate(12);
 
         return view('frontend.kategori-buku', compact('kategori', 'buku'));
     }
 
-public function detail($id)
-{
-    $buku = Buku::where('id_buku', $id)->firstOrFail();
+    public function detail($id)
+    {
+        $buku = Buku::where('id_buku', $id)->firstOrFail();
 
-    return view('frontend.view.detail', compact('buku'));
-}
+        return view('frontend.view.detail', compact('buku'));
+    }
 
-public function semuaBuku()
-{
-    $buku = Buku::all();
-    return view('frontend.view.semua_buku', compact('buku'));
-}
+    public function semuaBuku()
+    {
+        $buku = Buku::with('kategori')->orderBy('id_buku', 'desc')->get();
+        $kategoris = Kategori::all();
 
+        return view('frontend.view.semua_buku', compact('buku', 'kategoris'));
+    }
 }

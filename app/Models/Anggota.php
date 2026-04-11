@@ -20,14 +20,13 @@ class Anggota extends Model
 
     public $timestamps = false;
 
-public function user(){
-    return $this->belongsTo(User::class);
-}
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
-public function peminjaman()
-{
-    return $this->hasMany(Peminjaman::class, 'anggota_id', 'id_anggota');
-}
-
-
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class, 'anggota_id', 'id_anggota');
+    }
 }
