@@ -3,17 +3,17 @@
 use Illuminate\Support\Facades\Route;
 
 // ================= CONTROLLER =================
-use App\Http\Controllers\AnggotaController;
-use App\Http\Controllers\AuthAnggotaController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BukuController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\FrontendController;
-use App\Http\Controllers\KategoriController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\PeminjamanController;
-use App\Http\Controllers\PetugasController;
-use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\Backend\AnggotaController;
+use App\Http\Controllers\Frontend\AuthAnggotaController;
+use App\Http\Controllers\Backend\AuthController;
+use App\Http\Controllers\Backend\BukuController;
+use App\Http\Controllers\Backend\DashboardController;
+use App\Http\Controllers\Frontend\FrontendController;
+use App\Http\Controllers\Backend\KategoriController;
+use App\Http\Controllers\Frontend\LoginController;
+use App\Http\Controllers\Peminjaman\PeminjamanController;
+use App\Http\Controllers\Backend\PetugasController;
+use App\Http\Controllers\Backend\LaporanController;
 
 
 /*
