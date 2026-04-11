@@ -1,6 +1,6 @@
- @extends('backend.layout')
+@extends('backend.layout')
 
- @section('content')
+@section('content')
      <div class="container">
          <div class="page-inner">
 
@@ -34,7 +34,7 @@
                                      </div>
 
                                      <button type="submit" class="btn btn-md btn-primary me-3">Simpan</button>
-                                     <a href="/kategori" class="btn btn-warning">Kembali</a>
+                                     <a href="/admin/kategori" class="btn btn-warning">Kembali</a>
 
                                  </form>
                              </div>

@@ -1,19 +1,21 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-// ================= CONTROLLER =================
 use App\Http\Controllers\Backend\AnggotaController;
-use App\Http\Controllers\Frontend\AuthAnggotaController;
 use App\Http\Controllers\Backend\AuthController;
 use App\Http\Controllers\Backend\BukuController;
 use App\Http\Controllers\Backend\DashboardController;
-use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Backend\KategoriController;
-use App\Http\Controllers\Frontend\LoginController;
-use App\Http\Controllers\Peminjaman\PeminjamanController;
-use App\Http\Controllers\Backend\PetugasController;
 use App\Http\Controllers\Backend\LaporanController;
+use App\Http\Controllers\Backend\PetugasController;
+
+
+use App\Http\Controllers\Frontend\AuthAnggotaController;
+use App\Http\Controllers\Frontend\FrontendController;
+use App\Http\Controllers\Frontend\LoginController;
+
+use App\Http\Controllers\Peminjaman\PeminjamanController;
+
+use Illuminate\Support\Facades\Route;
 
 
 /*
@@ -76,8 +78,11 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::resource('buku', BukuController::class);
 });
 
-// Kategori
-Route::resource('kategori', KategoriController::class)->middleware('auth');
+
+// 🔥 KATEGORI - Pakai prefix admin
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::resource('kategori', KategoriController::class);
+});
 
 // Anggota
 Route::resource('anggota', AnggotaController::class)->middleware('auth');

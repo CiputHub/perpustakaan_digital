@@ -22,7 +22,7 @@ class KategoriController extends Controller
      */
     public function create()
     {
-        return view('backend.kategori.buat');
+        return view('backend.kategori.create');
     }
 
     /**

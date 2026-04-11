@@ -54,7 +54,7 @@
             <div class="bg-secondary bg-gradient text-white rounded-4 p-4 text-center shadow-sm">
                 <i class="fas fa-users fa-3x mb-2 opacity-75"></i>
                 <h3 class="fw-bold mb-0">{{ $totalAnggota ?? 0 }}</h3>
-                <small>Anggota Aktif</small>
+                <small>Total Anggota</small>
             </div>
         </div>
         <div class="col-md-3 col-6">

@@ -11,7 +11,9 @@
                     <div class="card-body">
                         <div class="table-responsive">
                             <table id="basic-datatables" class="display table table-striped table-hover">
-                                <a href="{{ route('kategori.buat') }}" class="btn btn-md btn-success mb-3">Tambah </a>
+                                <a href="{{ route('kategori.create') }}" class="btn btn-md btn-success mb-3">
+                                    <i class="fas fa-plus me-1"></i> Tambah
+                                </a>
                                 <thead>
                                     <tr>
                                         <th>No</th>
