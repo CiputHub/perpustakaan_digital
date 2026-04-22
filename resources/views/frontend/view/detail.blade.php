@@ -65,7 +65,7 @@
                                 <i class="fas fa-star text-warning"></i>
                                 <i class="fas fa-star text-warning"></i>
                                 <i class="fas fa-star-half-alt text-warning"></i>
-                               
+
                             </div>
 
                             <!-- Info Buku dalam Grid -->
@@ -151,9 +151,7 @@
                                 </button>
                                 @endif
 
-                                <button class="btn btn-outline-primary rounded-pill px-4 py-2" onclick="shareBuku()">
-                                    <i class="fas fa-share-alt me-2"></i>Bagikan
-                                </button>
+                               
                             </div>
                         </div>
                     </div>

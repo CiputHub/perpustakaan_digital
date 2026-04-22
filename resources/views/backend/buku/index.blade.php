@@ -41,7 +41,6 @@
                         @endif
 
                         <div class="table-responsive">
-                            {{-- DataTable akan otomatis diinisialisasi oleh JS --}}
                             <table id="basic-datatables" class="display table table-striped table-hover">
 
                                 {{-- Arahkan ke route 'buku.create' yang menampilkan form tambah buku --}}

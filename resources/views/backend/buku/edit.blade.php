@@ -32,19 +32,16 @@
                                 - method: POST (dengan @method('PUT'))
                                 - enctype: multipart/form-data (karena upload file gambar)
                             --}}
-                            <form action="{{ route('buku.update', $buku->id_buku) }}"
-                                  method="POST"
-                                  enctype="multipart/form-data">
+                            <form action="{{ route('buku.update', $buku->id_buku) }}" method="POST"
+                                enctype="multipart/form-data">
                                 @csrf
-                                @method('PUT')  {{-- Method spoofing untuk PUT --}}
+                                @method('PUT') {{-- Method spoofing untuk PUT --}}
 
                                 {{-- ==================== FIELD JUDUL ==================== --}}
                                 <div class="mb-3">
                                     <label>Judul</label>
-                                    <input type="text"
-                                           name="judul"
-                                           value="{{ old('judul', $buku->judul) }}"  {{-- old() lebih prioritas --}}
-                                           class="form-control @error('judul') is-invalid @enderror">
+                                    <input type="text" name="judul" value="{{ old('judul', $buku->judul) }}"
+                                        {{-- old() lebih prioritas --}} class="form-control @error('judul') is-invalid @enderror">
 
                                     @error('judul')
                                         <div class="text-danger mt-1">{{ $message }}</div>
@@ -58,9 +55,8 @@
                                     {{-- Tampilkan gambar lama jika ada --}}
                                     @if ($buku->gambar)
                                         <div class="mb-2">
-                                            <img src="{{ asset('storage/buku/' . $buku->gambar) }}"
-                                                 width="120"
-                                                 alt="Gambar {{ $buku->judul }}">
+                                            <img src="{{ asset('storage/buku/' . $buku->gambar) }}" width="120"
+                                                alt="Gambar {{ $buku->judul }}">
                                             <small class="text-muted d-block">Gambar saat ini</small>
                                         </div>
                                     @endif
@@ -73,49 +69,37 @@
                                 {{-- ==================== FIELD PENULIS ==================== --}}
                                 <div class="mb-3">
                                     <label>Penulis</label>
-                                    <input type="text"
-                                           name="penulis"
-                                           value="{{ old('penulis', $buku->penulis) }}"
-                                           class="form-control">
+                                    <input type="text" name="penulis" value="{{ old('penulis', $buku->penulis) }}"
+                                        class="form-control">
                                 </div>
 
                                 {{-- ==================== FIELD PENERBIT ==================== --}}
                                 <div class="mb-3">
                                     <label>Penerbit</label>
-                                    <input type="text"
-                                           name="penerbit"
-                                           value="{{ old('penerbit', $buku->penerbit) }}"
-                                           class="form-control">
+                                    <input type="text" name="penerbit" value="{{ old('penerbit', $buku->penerbit) }}"
+                                        class="form-control">
                                 </div>
 
                                 {{-- ==================== FIELD TAHUN TERBIT ==================== --}}
                                 <div class="mb-3">
                                     <label>Tahun Terbit</label>
-                                    <input type="date"
-                                           name="tahun_terbit"
-                                           value="{{ old('tahun_terbit', $buku->tahun_terbit) }}"
-                                           class="form-control">
+                                    <input type="date" name="tahun_terbit"
+                                        value="{{ old('tahun_terbit', $buku->tahun_terbit) }}" class="form-control">
                                 </div>
 
                                 {{-- ==================== FIELD DESKRIPSI ==================== --}}
                                 <div class="mb-3">
                                     <label>Deskripsi</label>
-                                    <textarea name="deskripsi"
-                                              class="form-control">{{ old('deskripsi', $buku->deskripsi) }}</textarea>
+                                    <textarea name="deskripsi" class="form-control"  rows="4">{{ old('deskripsi', $buku->deskripsi) }}</textarea>
                                 </div>
 
                                 {{-- ==================== FIELD STOK ==================== --}}
                                 {{-- 🔥 Stok tidak boleh minus --}}
                                 <div class="mb-3">
                                     <label>Stok</label>
-                                    <input type="number"
-                                           name="stok"
-                                           value="{{ old('stok', $buku->stok) }}"
-                                           class="form-control"
-                                           min="0"
-                                           step="1"
-                                           oninput="this.value = Math.abs(this.value)"
-                                           required>
+                                    <input type="number" name="stok" value="{{ old('stok', $buku->stok) }}"
+                                        class="form-control" min="0" step="1"
+                                        oninput="this.value = Math.abs(this.value)" required>
                                     <small class="text-muted">Stok minimal 0 (tidak bisa minus)</small>
                                 </div>
 

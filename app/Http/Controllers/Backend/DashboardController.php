@@ -13,45 +13,41 @@ class DashboardController extends Controller
 {
     /**
      * Menampilkan dashboard utama
+     * Role petugas: 4 card (Total Buku, Total Anggota, Dipinjam, Total Transaksi)
+     * Role kepala_perpus: 8 card (semua)
      */
     public function index()
     {
         $user = Auth::user();
 
-        // Default data
-        $labelUser = 'Total Anggota';
-        $totalUser = Anggota::count();
 
-        // Jika kepala perpustakaan
-        if ($user->role == 'kepala_perpus') {
-            $labelUser = 'Total Petugas';
-            $totalUser = Petugas::count();
-        }
-
-        // Statistik
         $totalBuku = Buku::count();
+        $totalAnggota = Anggota::count();
         $peminjamanAktif = Peminjaman::where('status', 'dipinjam')->count();
-        $terlambat = Peminjaman::where('status', 'terlambat')->count();
-        $selesai = Peminjaman::where('status', 'dikembalikan')->count();
-
-        $totalDenda = Peminjaman::sum('denda');
         $totalTransaksi = Peminjaman::count();
 
-        // Data terbaru
+
+        $totalPetugas = Petugas::count();
+        $terlambat = Peminjaman::where('status', 'terlambat')->count();
+        $selesai = Peminjaman::where('status', 'dikembalikan')->count();
+        $totalDenda = Peminjaman::sum('denda');
+
+
         $data = Peminjaman::with(['buku', 'anggota'])
             ->latest('id_peminjaman')
             ->limit(5)
             ->get();
 
+
         return view('backend.dashboard', compact(
             'totalBuku',
-            'labelUser',
-            'totalUser',
+            'totalAnggota',
             'peminjamanAktif',
+            'totalTransaksi',
+            'totalPetugas',
             'terlambat',
             'selesai',
             'totalDenda',
-            'totalTransaksi',
             'data'
         ));
     }

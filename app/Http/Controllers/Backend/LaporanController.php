@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Anggota;
 use App\Models\Buku;
 use App\Models\Peminjaman;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
@@ -13,18 +14,26 @@ class LaporanController extends Controller
     /**
      * Menampilkan semua laporan peminjaman
      */
-    public function index()
-    {
-        $data = Peminjaman::with(['buku', 'anggota'])
-            ->latest('id_peminjaman')
-            ->get();
+    public function index(Request $request)
+{
+    $query = Peminjaman::with(['buku', 'anggota']);
 
-        $anggota = Anggota::all();
-        $buku = Buku::all();
-
-        return view('backend.laporan.index', compact('data', 'anggota', 'buku'));
+    // FILTER
+    if ($request->filter == 'hari_ini') {
+        $query->whereDate('tanggal_pinjam', now());
+    } elseif ($request->filter == 'mingguan') {
+        $query->whereBetween('tanggal_pinjam', [now()->startOfWeek(), now()->endOfWeek()]);
+    } elseif ($request->filter == 'bulanan') {
+        $query->whereMonth('tanggal_pinjam', now()->month);
     }
 
+    $data = $query->latest('id_peminjaman')->get();
+
+    $totalPinjam = $data->count();
+    $totalDenda = $data->sum('denda');
+
+    return view('backend.laporan.index', compact('data', 'totalPinjam', 'totalDenda'));
+}
     /**
      * Menyimpan data laporan
      */
@@ -86,6 +95,30 @@ class LaporanController extends Controller
         return redirect()->route('laporan.index')->with('success', 'Data berhasil diupdate');
     }
 
+
+    public function exportPdf(Request $request)
+{
+    $query = Peminjaman::with(['anggota', 'buku']);
+
+    // FILTER SAMA
+    if ($request->filter == 'hari_ini') {
+        $query->whereDate('tanggal_pinjam', now());
+    } elseif ($request->filter == 'mingguan') {
+        $query->whereBetween('tanggal_pinjam', [now()->startOfWeek(), now()->endOfWeek()]);
+    } elseif ($request->filter == 'bulanan') {
+        $query->whereMonth('tanggal_pinjam', now()->month);
+    }
+
+    $data = $query->get();
+
+    $totalPinjam = $data->count();
+    $totalDenda = $data->sum('denda');
+
+    $pdf = Pdf::loadView('backend.laporan.pdf', compact('data', 'totalPinjam', 'totalDenda'))
+        ->setPaper('A4', 'landscape');
+
+    return $pdf->download('laporan_peminjaman.pdf');
+}
     /**
      * Hapus laporan
      */

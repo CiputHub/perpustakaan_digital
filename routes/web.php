@@ -1,5 +1,6 @@
 <?php
 
+//Beckend Controller
 use App\Http\Controllers\Backend\AnggotaController;
 use App\Http\Controllers\Backend\AuthController;
 use App\Http\Controllers\Backend\BukuController;
@@ -8,11 +9,12 @@ use App\Http\Controllers\Backend\KategoriController;
 use App\Http\Controllers\Backend\LaporanController;
 use App\Http\Controllers\Backend\PetugasController;
 
-
+//Frontend Controller
 use App\Http\Controllers\Frontend\AuthAnggotaController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Frontend\LoginController;
 
+//Peminjaman
 use App\Http\Controllers\Peminjaman\PeminjamanController;
 
 use Illuminate\Support\Facades\Route;
@@ -104,3 +106,6 @@ Route::middleware(['auth', 'role:kepala_perpus,petugas'])->group(function () {
 Route::middleware(['auth', 'role:kepala_perpus,petugas'])->group(function () {
     Route::resource('laporan', LaporanController::class);
 });
+
+Route::get('/laporan/export/pdf', [LaporanController::class, 'exportPdf'])
+    ->name('laporan.export.pdf');

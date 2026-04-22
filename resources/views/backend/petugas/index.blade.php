@@ -10,6 +10,24 @@
                         <h3 class="fw-bold mb-4">Data Petugas</h3>
                     </div>
                     <div class="card-body">
+
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
+
+                        @if ($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
                         <div class="table-responsive">
                             <a href="{{ route('petugas.create') }}" class="btn btn-md btn-success mb-3">
                                 <i class="fas fa-plus me-1"></i> Tambah
@@ -43,8 +61,8 @@
                                                     class="btn btn-sm btn-warning">
                                                     <i class="fas fa-edit me-1"></i> Edit
                                                 </a>
-                                                <form action="{{ route('petugas.destroy', $p->id_petugas) }}" method="POST"
-                                                    style="display:inline;"
+                                                <form action="{{ route('petugas.destroy', $p->id_petugas) }}"
+                                                    method="POST" style="display:inline;"
                                                     onsubmit="return confirm('Yakin hapus data ini?')">
                                                     @csrf
                                                     @method('DELETE')
@@ -62,23 +80,7 @@
                 </div>
             </div>
 
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
 
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
 
         </div>
     </div>

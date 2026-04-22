@@ -25,7 +25,7 @@
             @endif
 
             {{-- BUKU (kepala + petugas) --}}
-            @if (in_array($role, ['kepala_perpus', 'petugas']))
+            @if ($role == 'petugas')
                 <li class="nav-item {{ request()->routeIs('buku.*') ? 'active' : '' }}">
                     <a href="{{ route('buku.index') }}">
                         <i class="fas fa-book-open"></i>

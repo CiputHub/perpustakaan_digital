@@ -1,519 +1,484 @@
 @extends('backend.layout')
 
 @section('content')
-    <div class="container">
-        <div class="page-inner">
+<div class="container">
+    <div class="page-inner">
 
-            <!-- Header Section -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <h3 class="fw-bold mb-1">📊 Data Laporan Peminjaman</h3>
-                            <p class="text-muted mb-0">Laporan lengkap peminjaman buku perpustakaan digital</p>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-primary rounded-pill px-4" onclick="printReport()">
-                                <i class="fas fa-print me-2"></i>Cetak / PDF
-                            </button>
-                        </div>
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <h3 class="fw-bold mb-1">📋 Laporan Peminjaman</h3>
+                        <p class="text-muted mb-0">Data lengkap peminjaman buku</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <form method="GET" action="{{ route('laporan.index') }}" class="d-flex gap-2" id="filterForm">
+                            <select name="filter" class="form-select rounded-pill" style="width: 140px;" onchange="this.form.submit()">
+                                <option value="">📅 Semua</option>
+                                <option value="hari_ini" {{ request('filter') == 'hari_ini' ? 'selected' : '' }}>📆 Hari Ini</option>
+                                <option value="mingguan" {{ request('filter') == 'mingguan' ? 'selected' : '' }}>📊 Minggu Ini</option>
+                                <option value="bulanan" {{ request('filter') == 'bulanan' ? 'selected' : '' }}>📅 Bulan Ini</option>
+                            </select>
+                            <a href="{{ route('laporan.export.pdf', request()->query()) }}" class="btn btn-danger rounded-pill px-3">
+                                <i class="fas fa-file-pdf me-1"></i> PDF
+                            </a>
+                        </form>
                     </div>
                 </div>
             </div>
-
-            <!-- Statistik Cards -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3 col-6">
-                    <div class="card border-0 shadow-sm rounded-4 bg-primary bg-gradient text-white">
-                        <div class="card-body py-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <small class="opacity-75">Total Peminjaman</small>
-                                    <h3 class="fw-bold mb-0">{{ $totalPinjam ?? $data->count() }}</h3>
-                                </div>
-                                <i class="fas fa-book fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="card border-0 shadow-sm rounded-4 bg-warning text-dark">
-                        <div class="card-body py-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <small class="opacity-75">Sedang Dipinjam</small>
-                                    <h3 class="fw-bold mb-0">{{ $data->where('status', 'dipinjam')->count() }}</h3>
-                                </div>
-                                <i class="fas fa-spinner fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="card border-0 shadow-sm rounded-4 bg-success text-white">
-                        <div class="card-body py-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <small class="opacity-75">Selesai</small>
-                                    <h3 class="fw-bold mb-0">{{ $data->where('status', 'dikembalikan')->count() }}</h3>
-                                </div>
-                                <i class="fas fa-check-circle fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="card border-0 shadow-sm rounded-4 bg-danger bg-gradient text-white">
-                        <div class="card-body py-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <small class="opacity-75">Total Denda</small>
-                                    <h3 class="fw-bold mb-0">Rp
-                                        {{ number_format($totalDenda ?? $data->sum('denda'), 0, ',', '.') }}</h3>
-                                </div>
-                                <i class="fas fa-money-bill-wave fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Area yang akan di-print -->
-            <div id="printArea" class="print-area">
-                <div class="text-center mb-4 print-header">
-                    <h2 class="fw-bold">📚 LAPORAN PEMINJAMAN BUKU</h2>
-                    <p class="text-muted">Perpustakaan Digital</p>
-                    {{-- <p>Tanggal Cetak: {{ date('d-m-Y H:i:s') }}</p> --}}
-                    <hr class="my-3">
-                </div>
-
-                <!-- Tabel Laporan -->
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-header bg-white border-0 pt-4 px-4">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                            <h5 class="fw-bold mb-0">
-                                <i class="fas fa-table me-2 text-primary"></i>Daftar Laporan Peminjaman
-                            </h5>
-                            <div class="d-flex gap-2">
-                                <div class="input-group" style="width: 250px;">
-                                    <span class="input-group-text bg-white border-end-0">
-                                        <i class="fas fa-search text-muted"></i>
-                                    </span>
-                                    <input type="text" id="searchInput" class="form-control border-start-0"
-                                        placeholder="Search for reports...">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body p-4 pt-0">
-                        <div class="table-responsive">
-                            <table id="laporan-datatables" class="display table table-striped table-hover w-100">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th style="width: 50px;">No</th>
-                                        <th>Nama Anggota</th>
-                                        <th>Judul Buku</th>
-                                        <th>Tanggal Pinjam</th>
-                                        <th>Tanggal Kembali</th>
-                                        <th>Denda</th>
-                                        <th>Status</th>
-                                        <th style="width: 80px;">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($data as $key => $row)
-                                        <tr>
-                                            <td class="text-center">{{ $key + 1 }}</td>
-                                            <td>
-                                                <div class="fw-semibold">{{ $row->anggota->nama ?? '-' }}</div>
-                                                <small class="text-muted">{{ $row->anggota->email ?? '' }}</small>
-                                            </td>
-                                            <td>{{ $row->buku->judul ?? '-' }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($row->tanggal_pinjam)->format('d/m/Y') }}</td>
-                                            <td>
-                                                @if ($row->tanggal_pengembalian)
-                                                    {{ \Carbon\Carbon::parse($row->tanggal_pengembalian)->format('d/m/Y') }}
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($row->denda && $row->denda > 0)
-                                                    <span class="text-danger fw-bold">Rp
-                                                        {{ number_format($row->denda, 0, ',', '.') }}</span>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($row->status == 'menunggu')
-                                                    <span class="badge bg-warning px-3 py-2 rounded-pill">⏳ Menunggu</span>
-                                                @elseif($row->status == 'dipinjam')
-                                                    <span class="badge bg-primary px-3 py-2 rounded-pill">📖 Dipinjam</span>
-                                                @elseif($row->status == 'dikembalikan')
-                                                    <span class="badge bg-success px-3 py-2 rounded-pill">✅ Selesai</span>
-                                                @elseif($row->status == 'terlambat')
-                                                    <span class="badge bg-danger px-3 py-2 rounded-pill">⚠️ Terlambat</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                <a href="{{ route('laporan.show', $row->id_peminjaman) }}"
-                                                    class="btn btn-info btn-sm rounded-circle" title="Detail">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="{{ route('laporan.edit', $row->id_peminjaman) }}"
-                                                    class="btn btn-warning btn-sm rounded-circle" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot class="table-light">
-                                    <tr>
-                                        {{-- <th colspan="5" class="text-end fw-bold">Total Denda:</th> --}}
-                                        <th class="fw-bold text-danger">Rp
-                                            {{ number_format($data->sum('denda'), 0, ',', '.') }}</th>
-                                        <th colspan="2"></th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white border-0 pb-4 px-4">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Menampilkan <span id="showingStart">1</span> - <span
-                                    id="showingEnd">{{ min(10, $data->count()) }}</span>
-                                dari <span id="totalEntries">{{ $data->count() }}</span> entri
-                            </small>
-                            <div class="text-muted small">
-                                <i class="fas fa-money-bill-wave me-1 text-danger"></i>
-                                <strong>Total Denda Keseluruhan: Rp
-                                    {{ number_format($data->sum('denda'), 0, ',', '.') }}</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer untuk print -->
-                <div class="print-footer text-center mt-4 pt-3">
-                    <hr>
-                    <small class="text-muted">
-                        Laporan ini dibuat secara otomatis oleh sistem Perpustakaan Digital<br>
-                        *Dokumen ini sah tanpa tanda tangan
-                    </small>
-                </div>
-            </div>
-
         </div>
-    </div>
 
-    <!-- Modal Print Preview -->
-    <div class="modal fade" id="printModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content rounded-4">
-                <div class="modal-header bg-primary text-white border-0 rounded-top-4">
-                    <h5 class="modal-title">
-                        <i class="fas fa-print me-2"></i>Cetak Laporan
+        <!-- Statistik Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card bg-primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Peminjaman</span>
+                        <h3 class="stat-value">{{ $data->count() }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card bg-warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Dipinjam</span>
+                        <h3 class="stat-value">{{ $data->where('status', 'dipinjam')->count() }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card bg-success">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Selesai</span>
+                        <h3 class="stat-value">{{ $data->where('status', 'dikembalikan')->count() }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card bg-danger">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Denda</span>
+                        <h3 class="stat-value">Rp {{ number_format($data->sum('denda'), 0, ',', '.') }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Laporan -->
+        <div class="data-card">
+            <div class="data-card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-table-list me-2 text-primary"></i> Data Peminjaman
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
                 </div>
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="card border shadow-sm rounded-3">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
-                                    <h6>Export ke PDF</h6>
-                                    <p class="small text-muted">Simpan laporan sebagai file PDF</p>
-                                    <button class="btn btn-danger rounded-pill px-4" onclick="exportToPDF()">
-                                        <i class="fas fa-download me-2"></i>Export PDF
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card border shadow-sm rounded-3">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-print fa-3x text-primary mb-2"></i>
-                                    <h6>Cetak Langsung</h6>
-                                    <p class="small text-muted">Cetak laporan ke printer</p>
-                                    <button class="btn btn-primary rounded-pill px-4" onclick="printDirect()">
-                                        <i class="fas fa-print me-2"></i>Cetak Sekarang
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+            <div class="data-card-body">
+                <div class="table-responsive">
+                    <table class="data-table" id="basic-datatables">
+                        <thead>
+                            <tr>
+                                <th width="50">No</th>
+                                <th>Anggota</th>
+                                <th>Buku</th>
+                                <th>Tgl Pinjam</th>
+                                <th>Tgl Kembali</th>
+                                <th>Denda</th>
+                                <th>Status</th>
+                                <th width="80">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($data as $key => $row)
+                            <tr>
+                                <td class="text-center">{{ $key + 1 }}</td>
+                                <td>
+                                    <div class="fw-semibold">{{ $row->anggota->nama ?? '-' }}</div>
+                                    <small class="text-muted">{{ $row->anggota->email ?? '' }}</small>
+                                </td>
+                                <td>{{ $row->buku->judul ?? '-' }}</td>
+                                <td>{{ \Carbon\Carbon::parse($row->tanggal_pinjam)->format('d/m/Y') }}</td>
+                                <td>
+                                    @if ($row->tanggal_pengembalian)
+                                        {{ \Carbon\Carbon::parse($row->tanggal_pengembalian)->format('d/m/Y') }}
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($row->denda && $row->denda > 0)
+                                        <span class="denda">Rp {{ number_format($row->denda, 0, ',', '.') }}</span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($row->status == 'menunggu')
+                                        <span class="badge-status warning">Menunggu</span>
+                                    @elseif($row->status == 'dipinjam')
+                                        <span class="badge-status primary">Dipinjam</span>
+                                    @elseif($row->status == 'dikembalikan')
+                                        <span class="badge-status success">Selesai</span>
+                                    @elseif($row->status == 'terlambat')
+                                        <span class="badge-status danger">Terlambat</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <div class="action-buttons">
+                                        <a href="{{ route('laporan.show', $row->id_peminjaman) }}" class="action-btn view" title="Detail">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('laporan.edit', $row->id_peminjaman) }}" class="action-btn edit" title="Edit">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4"
-                        data-bs-dismiss="modal">Batal</button>
+            </div>
+            <div class="data-card-footer">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Total <span id="totalEntries">{{ $data->count() }}</span> data peminjaman
+                    </small>
+                    <div class="pagination-info" id="paginationInfo"></div>
                 </div>
             </div>
         </div>
+
     </div>
+</div>
 
-    <!-- Style untuk Print -->
-    <style>
-        @media print {
+<style>
+    /* Stat Cards */
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+        border: 1px solid #f0f0f0;
+    }
 
-            /* Sembunyikan semua elemen selain printArea */
-            body * {
-                visibility: hidden;
-            }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
 
-            #printArea,
-            #printArea * {
-                visibility: visible;
-            }
+    .stat-card.bg-primary { background: linear-gradient(135deg, #4e73df, #224abe); }
+    .stat-card.bg-warning { background: linear-gradient(135deg, #f6c23e, #dda20a); }
+    .stat-card.bg-success { background: linear-gradient(135deg, #1cc88a, #13855c); }
+    .stat-card.bg-danger { background: linear-gradient(135deg, #e74a3b, #be2617); }
 
-            #printArea {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                margin: 0;
-                padding: 20px;
-                background: white;
-                z-index: 9999;
-            }
+    .stat-card .stat-icon {
+        width: 55px;
+        height: 55px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+    }
 
-            /* Style tabel saat print */
-            #printArea table {
-                width: 100% !important;
-                border-collapse: collapse;
-                font-size: 12px;
-            }
+    .stat-card .stat-info {
+        flex: 1;
+    }
 
-            #printArea table,
-            #printArea th,
-            #printArea td {
-                border: 1px solid #ddd;
-            }
+    .stat-card .stat-label {
+        font-size: 12px;
+        opacity: 0.8;
+        color: white;
+        display: block;
+    }
 
-            #printArea th {
-                background: #f5f5f5;
-                text-align: center;
-                padding: 8px;
-            }
+    .stat-card .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+        color: white;
+        line-height: 1.2;
+    }
 
-            #printArea td {
-                padding: 6px 8px;
-            }
+    /* Data Card */
+    .data-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
 
-            #printArea .badge {
-                border: none;
-                padding: 2px 8px;
-            }
+    .data-card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #f0f0f0;
+        background: white;
+    }
 
-            #printArea .print-header {
-                margin-bottom: 20px;
-            }
+    .data-card-body {
+        padding: 0;
+        overflow-x: auto;
+    }
 
-            #printArea .print-footer {
-                margin-top: 30px;
-                position: fixed;
-                bottom: 20px;
-                left: 20px;
-                right: 20px;
-            }
+    .data-card-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #f0f0f0;
+        background: #fafbfc;
+    }
 
-            /* Sembunyikan elemen yang tidak perlu saat print */
-            .btn,
-            .card-header .input-group,
-            .dataTables_filter,
-            .dataTables_length,
-            .dataTables_paginate,
-            .card-footer {
-                display: none !important;
-            }
 
-            /* Pastikan tabel tidak terpotong */
-            .table-responsive {
-                overflow: visible !important;
-            }
 
-            @page {
-                size: landscape;
-                margin: 1.5cm;
-            }
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid #e5e7eb;
+        border-radius: 30px;
+        font-size: 14px;
+        transition: all 0.3s;
+        background: white;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #4e73df;
+        box-shadow: 0 0 0 3px rgba(78,115,223,0.1);
+    }
+
+    /* Table */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .data-table thead th {
+        padding: 14px 16px;
+        background: #f8f9fc;
+        font-weight: 600;
+        color: #4a5568;
+        border-bottom: 2px solid #e9ecef;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #2d3748;
+        vertical-align: middle;
+    }
+
+    .data-table tbody tr:hover {
+        background: #f8f9fc;
+    }
+
+    /* Badge Status */
+    .badge-status {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .badge-status.primary {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .badge-status.success {
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+
+    .badge-status.warning {
+        background: #fff3e0;
+        color: #ed6c02;
+    }
+
+    .badge-status.danger {
+        background: #ffebee;
+        color: #d32f2f;
+    }
+
+    /* Denda */
+    .denda {
+        color: #dc2626;
+        font-weight: 600;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    .action-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .action-btn.view {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .action-btn.view:hover {
+        background: #1976d2;
+        color: white;
+    }
+
+    .action-btn.edit {
+        background: #fff3e0;
+        color: #ed6c02;
+    }
+
+    .action-btn.edit:hover {
+        background: #ed6c02;
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stat-card {
+            padding: 15px;
         }
 
-        /* Style untuk PDF Export (screen) */
-        .print-area-preview {
-            padding: 30px;
-            background: white;
+        .stat-card .stat-icon {
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
         }
 
-        .print-area-preview table {
+        .stat-card .stat-value {
+            font-size: 18px;
+        }
+
+        .search-wrapper {
             width: 100%;
-            border-collapse: collapse;
         }
 
-        .print-area-preview th,
-        .print-area-preview td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+        .data-card-header {
+            padding: 16px;
         }
 
-        .print-area-preview th {
-            background: #f5f5f5;
+        .data-card-footer {
+            padding: 12px 16px;
         }
 
-        .rounded-4 {
-            border-radius: 1rem !important;
+        .data-table thead th,
+        .data-table tbody td {
+            padding: 10px 12px;
+            font-size: 12px;
         }
+    }
+</style>
 
-        .rounded-top-4 {
-            border-top-left-radius: 1rem !important;
-            border-top-right-radius: 1rem !important;
-        }
 
-        .bg-gradient {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, #0a58ca 100%);
-        }
+<!-- Print Area untuk PDF (tetap dipertahankan) -->
+<div id="printArea" style="display: none;">
+    <div class="text-center mb-4">
+        <h2>LAPORAN PEMINJAMAN BUKU</h2>
+        <p>Perpustakaan Digital</p>
+        <hr>
+    </div>
+    <table border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Anggota</th>
+                <th>Buku</th>
+                <th>Tgl Pinjam</th>
+                <th>Tgl Kembali</th>
+                <th>Denda</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($data as $key => $row)
+            <tr>
+                <td>{{ $key + 1 }}</td>
+                <td>{{ $row->anggota->nama ?? '-' }}</td>
+                <td>{{ $row->buku->judul ?? '-' }}</td>
+                <td>{{ \Carbon\Carbon::parse($row->tanggal_pinjam)->format('d/m/Y') }}</td>
+                <td>{{ $row->tanggal_pengembalian ? \Carbon\Carbon::parse($row->tanggal_pengembalian)->format('d/m/Y') : '-' }}</td>
+                <td>{{ $row->denda ? 'Rp ' . number_format($row->denda,0,',','.') : '-' }}</td>
+                <td>{{ $row->status }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
 
-        .bg-danger.bg-gradient {
-            background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
-        }
+<script>
+function printDirect() {
+    var printContent = document.getElementById('printArea').innerHTML;
+    var originalContent = document.body.innerHTML;
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+    location.reload();
+}
 
-        .table th {
-            font-weight: 600;
-            white-space: nowrap;
-        }
+function exportToPDF() {
+    alert('Fitur PDF akan segera hadir');
+}
 
-        .dataTables_wrapper .dataTables_filter {
-            display: none;
-        }
-    </style>
+var table = $('#laporanTable').DataTable({
+    pageLength: 10,
+    order: [[3, 'desc']],
+    columnDefs: [
+        { orderable: false, targets: [0, 7] }
+    ],
+    dom: 'lrtip'
+});
 
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
-    <script>
-        $(document).ready(function() {
-            // Inisialisasi DataTable
-            var table = $('#laporan-datatables').DataTable({
-                pageLength: 10,
-                lengthMenu: [
-                    [5, 10, 25, 50, -1],
-                    [5, 10, 25, 50, "Semua"]
-                ],
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ entri",
-                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ entri",
-                    infoEmpty: "Tidak ada data",
-                    zeroRecords: "Data tidak ditemukan",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "→",
-                        previous: "←"
-                    }
-                },
-                order: [
-                    [3, 'desc']
-                ],
-                columnDefs: [{
-                    orderable: false,
-                    targets: [7]
-                }]
-            });
-
-            // Custom search input
-            $('#searchInput').on('keyup', function() {
-                table.search(this.value).draw();
-            });
-
-            // Update showing info
-            table.on('draw', function() {
-                var info = table.page.info();
-                $('#showingStart').text(info.start + 1);
-                $('#showingEnd').text(info.end);
-                $('#totalEntries').text(info.recordsTotal);
-            });
+table.on('order.dt search.dt draw.dt', function () {
+    table.column(0, { search: 'applied', order: 'applied' })
+        .nodes()
+        .each(function (cell, i) {
+            cell.innerHTML = i + 1;
         });
+}).draw();
+</script>
 
-        // Fungsi untuk print langsung
-        function printDirect() {
-            window.print();
-        }
-
-        // Fungsi untuk menampilkan modal print
-        function printReport() {
-            new bootstrap.Modal(document.getElementById('printModal')).show();
-        }
-
-        // Fungsi untuk export ke PDF menggunakan html2pdf
-        function exportToPDF() {
-            // Sembunyikan modal terlebih dahulu
-            bootstrap.Modal.getInstance(document.getElementById('printModal')).hide();
-
-            // Ambil elemen yang akan diexport
-            const element = document.getElementById('printArea');
-
-            // Clone element untuk menghindari perubahan pada tampilan asli
-            const cloneElement = element.cloneNode(true);
-            cloneElement.classList.add('print-area-preview');
-
-            // Buat container sementara
-            const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.top = '-9999px';
-            tempDiv.style.left = '-9999px';
-            tempDiv.appendChild(cloneElement);
-            document.body.appendChild(tempDiv);
-
-            // Konfigurasi PDF
-            const opt = {
-                margin: [0.5, 0.5, 0.5, 0.5],
-                filename: 'laporan_peminjaman_' + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + '.pdf',
-                image: {
-                    type: 'jpeg',
-                    quality: 0.98
-                },
-                html2canvas: {
-                    scale: 2,
-                    letterRendering: true,
-                    useCORS: true
-                },
-                jsPDF: {
-                    unit: 'in',
-                    format: 'a4',
-                    orientation: 'landscape'
-                }
-            };
-
-            // Export ke PDF
-            html2pdf().set(opt).from(cloneElement).save().then(() => {
-                // Hapus container sementara
-                document.body.removeChild(tempDiv);
-            }).catch(() => {
-                document.body.removeChild(tempDiv);
-                alert('Gagal mengekspor PDF. Silakan coba lagi.');
-            });
-        }
-
-        // Fungsi untuk mengubah status badge menjadi teks biasa saat print
-        window.onbeforeprint = function() {
-            document.querySelectorAll('#printArea .badge').forEach(badge => {
-                badge.style.border = 'none';
-                badge.style.background = 'transparent';
-                badge.style.color = 'black';
-                badge.style.padding = '0';
-            });
-        };
-
-        window.onafterprint = function() {
-            location.reload();
-        };
-    </script>
 @endsection
